@@ -1,5 +1,7 @@
 apply plugin: 'com.android.application'
 
+def THE_MOVIE_DB_API_KEY = getTheMovieDbApiKeyProperty()
+
 android {
     compileSdkVersion 22
     buildToolsVersion "22.0.1"
@@ -11,15 +13,42 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
     buildTypes {
+        debug {
+            buildConfigField "String", "THE_MOVIE_DB_API_KEY", THE_MOVIE_DB_API_KEY
+        }
+
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "THE_MOVIE_DB_API_KEY", THE_MOVIE_DB_API_KEY
         }
     }
+}
+
+repositories {
+    mavenCentral()
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:22.2.1'
+    compile 'com.squareup.picasso:picasso:2.5.2'
+}
+
+def getTheMovieDbApiKeyProperty() {
+    def propFile = new File("app/dev_api_keys.properties")
+    if (!propFile.canRead()) {
+        throw new InvalidUserDataException("app/dev_api_keys.properties file not found")
+    }
+
+    def Properties props = new Properties()
+    props.load(propFile.newDataInputStream())
+
+    if (props == null || !props.containsKey("theMovieDbApiKey")) {
+        throw new InvalidUserDataException("theMovieDbApiKey property not found in dev_api_keys.properties")
+    }
+
+    return props["theMovieDbApiKey"]
 }
