@@ -12,11 +12,10 @@
         android:id="@+id/gridView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:columnWidth="@dimen/gridview_movie_column_width"
-        android:gravity="center_horizontal"
-        android:horizontalSpacing="@dimen/gridview_column_space"
+        android:columnWidth="@dimen/image_thumbnail_width"
+        android:horizontalSpacing="@dimen/image_thumbnail_spacing"
         android:numColumns="auto_fit"
         android:stretchMode="columnWidth"
-        android:verticalSpacing="@dimen/gridview_row_space"
+        android:verticalSpacing="@dimen/image_thumbnail_spacing"
         />
 </FrameLayout>
