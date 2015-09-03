@@ -10,18 +10,24 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+import com.jclin.popularmovies.data.GetMoviesTask;
+import com.jclin.popularmovies.data.Movie;
+import com.jclin.popularmovies.data.SortOrder;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public final class ImageAdapter extends BaseAdapter
 {
     private final Context _context;
-    private final Uri[] _posterImageUris;
+    private final GetMoviesTask _getMoviesTask;
 
     private int _numColumns      = 0;
     private int _itemPixelWidth  = 0;
     private int _itemPixelHeight = 0;
+
+    private ArrayList<Movie> _movies = new ArrayList<>();
 
     private AbsListView.LayoutParams _imageViewLayoutParams;
 
@@ -35,31 +41,28 @@ public final class ImageAdapter extends BaseAdapter
         _numColumns = numColumns;
     }
 
-    public ImageAdapter(Context context)
+    public ImageAdapter(Context context, GetMoviesTask getMoviesTask)
     {
-        _context = context;
+        _context       = context;
+        _getMoviesTask = getMoviesTask;
 
-        ArrayList<Uri> posterImageUris = new ArrayList<>();
-        posterImageUris.add(buildPosterImageUri("kqjL17yufvn9OVLyXYpvtyrFfak.jpg"));
-        posterImageUris.add(buildPosterImageUri("s5uMY8ooGRZOL0oe4sIvnlTsYQO.jpg"));
-        posterImageUris.add(buildPosterImageUri("7SGGUiTE6oc2fh9MjIk5M00dsQd.jpg"));
-        posterImageUris.add(buildPosterImageUri("uXZYawqUsChGSj54wcuBtEdUJbh.jpg"));
-        posterImageUris.add(buildPosterImageUri("6iQ4CMtYorKFfAmXEpAQZMnA0Qe.jpg"));
-        posterImageUris.add(buildPosterImageUri("xxOKDTQbQo7h1h7TyrQIW7u8KcJ.jpg"));
-        posterImageUris.add(buildPosterImageUri("5JU9ytZJyR3zmClGmVm9q4Geqbd.jpg"));
-        posterImageUris.add(buildPosterImageUri("t90Y3G8UGQp0f0DrP60wRu9gfrH.jpg"));
-        posterImageUris.add(buildPosterImageUri("yUlpRbbrac0GTNHZ1l20IHEcWAN.jpg"));
-        posterImageUris.add(buildPosterImageUri("aBBQSC8ZECGn6Wh92gKDOakSC8p.jpg"));
-        posterImageUris.add(buildPosterImageUri("qFC07nj9lWWmnbkS191AgFUth9J.jpg"));
-        posterImageUris.add(buildPosterImageUri("3zQvuSAUdC3mrx9vnSEpkFX0968.jpg"));
+        _getMoviesTask.setOnMoviesRetrievedListener(new GetMoviesTask.OnMoviesRetrievedListener()
+        {
+            @Override
+            public void onMoviesRetrieved(Movie[] movies)
+            {
+                Collections.addAll(_movies, movies);
+                notifyDataSetChanged();
+            }
+        });
 
-        _posterImageUris = posterImageUris.toArray(new Uri[posterImageUris.size()]);
+        _getMoviesTask.execute(SortOrder.Popularity);
     }
 
     @Override
     public int getCount()
     {
-        return 12;
+        return _movies.size();
     }
 
     @Override
@@ -100,7 +103,7 @@ public final class ImageAdapter extends BaseAdapter
 
         Picasso
             .with(_context)
-            .load(_posterImageUris[position])
+            .load(buildPosterImageUri(_movies.get(position).getPosterPath()))
             .resize(_itemPixelWidth, _itemPixelHeight)
             .centerInside()
             .error(R.drawable.minions)

@@ -10,6 +10,8 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
+import com.jclin.popularmovies.data.GetMoviesTask;
+
 public class MoviesActivityFragment extends Fragment
 {
     private ImageAdapter _imageAdapter;
@@ -27,7 +29,7 @@ public class MoviesActivityFragment extends Fragment
 
         setupGridViewLayout(gridView);
 
-        _imageAdapter = new ImageAdapter(getActivity());
+        _imageAdapter = new ImageAdapter(getActivity(), new GetMoviesTask());
         gridView.setAdapter(_imageAdapter);
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener()
