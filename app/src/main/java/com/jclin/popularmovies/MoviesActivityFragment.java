@@ -1,5 +1,7 @@
 package com.jclin.popularmovies;
 
+import android.content.Intent;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -32,14 +34,7 @@ public class MoviesActivityFragment extends Fragment
         _imageAdapter = new ImageAdapter(getActivity(), new GetMoviesTask());
         gridView.setAdapter(_imageAdapter);
 
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener()
-        {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-            {
-                Toast.makeText(getActivity(), "TODO: Launch Detail activity", Toast.LENGTH_SHORT).show();
-            }
-        });
+        gridView.setOnItemClickListener(new OnItemClickListener());
 
         return fragmentView;
     }
@@ -71,5 +66,17 @@ public class MoviesActivityFragment extends Fragment
             }
             }
         });
+    }
+
+    private final class OnItemClickListener implements AdapterView.OnItemClickListener
+    {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+        {
+            Intent movieDetailsIntent = new Intent(getActivity(), MovieDetailsActivity.class);
+            movieDetailsIntent.putExtra(getString(R.string.INTENT_DATA_MOVIE), _imageAdapter.getMovie(position));
+
+            startActivity(movieDetailsIntent);
+        }
     }
 }

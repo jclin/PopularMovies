@@ -3,4 +3,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="image_of_movie">Image of movie</string>
+    <string name="title_activity_movie_details">MovieDetailsActivity</string>
+    <string name="INTENT_DATA_MOVIE" translatable="false">DATA_MOVIE</string>
 </resources>

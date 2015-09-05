@@ -107,6 +107,7 @@ public final class ImageAdapter extends BaseAdapter
             .resize(_itemPixelWidth, _itemPixelHeight)
             .centerInside()
             .error(R.drawable.minions)
+            .noFade()
             .into(imageView);
 
         return imageView;
@@ -125,6 +126,11 @@ public final class ImageAdapter extends BaseAdapter
         _imageViewLayoutParams = new GridView.LayoutParams(_itemPixelWidth, _itemPixelHeight);
 
         notifyDataSetChanged();
+    }
+
+    public Movie getMovie(int position)
+    {
+        return _movies.get(position);
     }
 
     private static Uri buildPosterImageUri(String relativePath)
