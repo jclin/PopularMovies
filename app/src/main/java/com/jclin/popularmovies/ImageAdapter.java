@@ -11,8 +11,10 @@ import android.widget.GridView;
 import android.widget.ImageView;
 
 import com.jclin.popularmovies.data.GetMoviesTask;
+import com.jclin.popularmovies.data.ImageSize;
 import com.jclin.popularmovies.data.Movie;
 import com.jclin.popularmovies.data.SortOrder;
+import com.jclin.popularmovies.data.TheMovieDBImageUri;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -102,13 +104,12 @@ public final class ImageAdapter extends BaseAdapter
         }
 
         Picasso
-            .with(_context)
-            .load(buildPosterImageUri(_movies.get(position).getPosterPath()))
-            .resize(_itemPixelWidth, _itemPixelHeight)
-            .centerInside()
-            .error(R.drawable.minions)
-            .noFade()
-            .into(imageView);
+                .with(_context)
+                .load(TheMovieDBImageUri.buildFor(_movies.get(position).getPosterPath()))
+                .resize(_itemPixelWidth, _itemPixelHeight)
+                .centerInside()
+                .error(R.drawable.minions)
+                .into(imageView);
 
         return imageView;
     }
@@ -121,7 +122,7 @@ public final class ImageAdapter extends BaseAdapter
         }
 
         _itemPixelWidth  = itemPixelWidth;
-        _itemPixelHeight = calculateItemPixelHeightFrom(itemPixelWidth);
+        _itemPixelHeight = ImageSize.pixelHeightFrom(_context, itemPixelWidth);
 
         _imageViewLayoutParams = new GridView.LayoutParams(_itemPixelWidth, _itemPixelHeight);
 
@@ -131,25 +132,5 @@ public final class ImageAdapter extends BaseAdapter
     public Movie getMovie(int position)
     {
         return _movies.get(position);
-    }
-
-    private static Uri buildPosterImageUri(String relativePath)
-    {
-        final String imageSizePath = "w185";
-
-        return new Uri.Builder()
-                .scheme("http")
-                .authority("image.tmdb.org")
-                .appendPath("t")
-                .appendPath("p")
-                .appendPath(imageSizePath)
-                .appendPath(relativePath)
-                .build();
-    }
-
-    private int calculateItemPixelHeightFrom(int itemPixelWidth)
-    {
-        return (itemPixelWidth *_context.getResources().getInteger(R.integer.image_thumbnail_pixel_height)) /
-                _context.getResources().getInteger(R.integer.image_thumbnail_pixel_width);
     }
 }

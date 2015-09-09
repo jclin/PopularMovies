@@ -1,25 +1,39 @@
 package com.jclin.popularmovies;
 
+import android.content.Context;
 import android.content.Intent;
-import android.os.Parcelable;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.GridView;
-import android.widget.Toast;
 
 import com.jclin.popularmovies.data.GetMoviesTask;
 
 public class MoviesActivityFragment extends Fragment
 {
+    private final String LOG_TAG = MoviesActivityFragment.class.getName();
+
     private ImageAdapter _imageAdapter;
+    private ArrayAdapter<CharSequence> _sortingSpinnerAdapter;
 
     public MoviesActivityFragment()
     {
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+
+        setupAppBarSpinners();
     }
 
     @Override
@@ -46,24 +60,54 @@ public class MoviesActivityFragment extends Fragment
             @Override
             public void onGlobalLayout()
             {
-            if (_imageAdapter.getNumColumns() > 0)
-            {
-                return;
+                if (_imageAdapter.getNumColumns() > 0)
+                {
+                    return;
+                }
+
+                final int thumbnailPixelWidth   = getResources().getDimensionPixelSize(R.dimen.image_thumbnail_width);
+                final int thumbnailPixelSpacing = getResources().getDimensionPixelSize(R.dimen.image_thumbnail_spacing);
+
+                final int numColumns =
+                        (int) (gridView.getWidth() / (float) (thumbnailPixelWidth + thumbnailPixelSpacing));
+
+                if (numColumns > 0)
+                {
+                    final int columnWidth = (gridView.getWidth() / numColumns) - thumbnailPixelSpacing;
+
+                    _imageAdapter.setNumColumns(numColumns);
+                    _imageAdapter.setItemPixelWidth(columnWidth);
+                }
             }
+        });
+    }
 
-            final int thumbnailPixelWidth   = getResources().getDimensionPixelSize(R.dimen.image_thumbnail_width);
-            final int thumbnailPixelSpacing = getResources().getDimensionPixelSize(R.dimen.image_thumbnail_spacing);
+    private void setupAppBarSpinners()
+    {
+        AppCompatActivity activity = (AppCompatActivity)getActivity();
 
-            final int numColumns =
-                (int) (gridView.getWidth() / (float)(thumbnailPixelWidth + thumbnailPixelSpacing));
+        Context themedContext = activity.getSupportActionBar().getThemedContext();
+        if (themedContext == null)
+        {
+            Log.e(LOG_TAG, "Could not setup app bar spinners.");
+            return;
+        }
 
-            if (numColumns > 0)
+        _sortingSpinnerAdapter = ArrayAdapter.createFromResource(
+                themedContext,
+                R.array.movie_sorting_values,
+                R.layout.support_simple_spinner_dropdown_item
+        );
+
+        ActionBar actionBar = activity.getSupportActionBar();
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+        actionBar.setListNavigationCallbacks(_sortingSpinnerAdapter, new ActionBar.OnNavigationListener()
+        {
+            @Override
+            public boolean onNavigationItemSelected(int itemPosition, long itemId)
             {
-                final int columnWidth = (gridView.getWidth() / numColumns) - thumbnailPixelSpacing;
-
-                _imageAdapter.setNumColumns(numColumns);
-                _imageAdapter.setItemPixelWidth(columnWidth);
-            }
+                // TODO: Execute query on The Movie DB
+                return false;
             }
         });
     }
