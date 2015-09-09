@@ -104,12 +104,12 @@ public final class ImageAdapter extends BaseAdapter
         }
 
         Picasso
-                .with(_context)
-                .load(TheMovieDBImageUri.buildFor(_movies.get(position).getPosterPath()))
-                .resize(_itemPixelWidth, _itemPixelHeight)
-                .centerInside()
-                .error(R.drawable.minions)
-                .into(imageView);
+            .with(_context)
+            .load(TheMovieDBImageUri.buildFor(_movies.get(position).getPosterPath()))
+            .resize(_itemPixelWidth, _itemPixelHeight)
+            .centerInside()
+            .error(R.drawable.minions)
+            .into(imageView);
 
         return imageView;
     }
