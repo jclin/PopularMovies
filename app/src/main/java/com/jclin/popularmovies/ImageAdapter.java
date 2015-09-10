@@ -24,14 +24,18 @@ public final class ImageAdapter extends BaseAdapter
 {
     private final Context _context;
     private final GetMoviesTask _getMoviesTask;
+    private final ArrayList<Movie> _movies;
 
     private int _numColumns      = 0;
     private int _itemPixelWidth  = 0;
     private int _itemPixelHeight = 0;
 
-    private ArrayList<Movie> _movies = new ArrayList<>();
-
     private AbsListView.LayoutParams _imageViewLayoutParams;
+
+    public ArrayList<Movie> getMovies()
+    {
+        return _movies;
+    }
 
     public int getNumColumns()
     {
@@ -41,9 +45,10 @@ public final class ImageAdapter extends BaseAdapter
     public void setNumColumns(int numColumns)
     {
         _numColumns = numColumns;
+        notifyDataSetChanged();
     }
 
-    public ImageAdapter(Context context, GetMoviesTask getMoviesTask)
+    public ImageAdapter(Context context, GetMoviesTask getMoviesTask, ArrayList<Movie> movies)
     {
         _context       = context;
         _getMoviesTask = getMoviesTask;
@@ -58,7 +63,11 @@ public final class ImageAdapter extends BaseAdapter
             }
         });
 
-        _getMoviesTask.execute(SortOrder.Popularity);
+        _movies = (movies != null) ? movies : new ArrayList<Movie>();
+        if (_movies.size() == 0)
+        {
+            _getMoviesTask.execute(SortOrder.Popularity);
+        }
     }
 
     @Override
