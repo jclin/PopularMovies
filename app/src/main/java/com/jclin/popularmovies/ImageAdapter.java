@@ -1,7 +1,7 @@
 package com.jclin.popularmovies;
 
 import android.content.Context;
-import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,9 +22,13 @@ import java.util.Collections;
 
 public final class ImageAdapter extends BaseAdapter
 {
+    private final String LOG_TAG = ImageAdapter.class.getName();
+
     private final Context _context;
-    private final GetMoviesTask _getMoviesTask;
     private final ArrayList<Movie> _movies;
+
+    private SortOrder _sortOrder;
+    private GetMoviesTask _getMoviesTask;
 
     private int _numColumns      = 0;
     private int _itemPixelWidth  = 0;
@@ -48,25 +52,15 @@ public final class ImageAdapter extends BaseAdapter
         notifyDataSetChanged();
     }
 
-    public ImageAdapter(Context context, GetMoviesTask getMoviesTask, ArrayList<Movie> movies)
+    public ImageAdapter(Context context, ArrayList<Movie> movies, SortOrder sortOrder)
     {
-        _context       = context;
-        _getMoviesTask = getMoviesTask;
-
-        _getMoviesTask.setOnMoviesRetrievedListener(new GetMoviesTask.OnMoviesRetrievedListener()
-        {
-            @Override
-            public void onMoviesRetrieved(Movie[] movies)
-            {
-                Collections.addAll(_movies, movies);
-                notifyDataSetChanged();
-            }
-        });
+        _context   = context;
+        _sortOrder = sortOrder;
 
         _movies = (movies != null) ? movies : new ArrayList<Movie>();
         if (_movies.size() == 0)
         {
-            _getMoviesTask.execute(SortOrder.Popularity);
+            fetchMovies(_sortOrder);
         }
     }
 
@@ -141,5 +135,66 @@ public final class ImageAdapter extends BaseAdapter
     public Movie getMovie(int position)
     {
         return _movies.get(position);
+    }
+
+    public void sortBy(SortOrder sortOrder)
+    {
+        if (sortOrder == _sortOrder)
+        {
+            return;
+        }
+
+        _movies.clear();
+
+        _sortOrder = sortOrder;
+        fetchMovies(_sortOrder);
+
+        notifyDataSetChanged();
+    }
+
+    private void fetchMovies(SortOrder sortOrder)
+    {
+        switch (sortOrder)
+        {
+            case Popularity:
+                cancel(_getMoviesTask);
+                _getMoviesTask = new GetMoviesTask(SortOrder.Popularity);
+                Log.i(LOG_TAG, "Fetching movies by popularity...");
+                break;
+
+            case Rating:
+                cancel(_getMoviesTask);
+                _getMoviesTask = new GetMoviesTask(SortOrder.Rating);
+                Log.i(LOG_TAG, "Fetching movies by rating...");
+                break;
+        }
+
+        _getMoviesTask.setOnMoviesRetrievedListener(new GetMoviesTask.OnMoviesRetrievedListener()
+        {
+            @Override
+            public void onMoviesRetrieved(Movie[] movies)
+            {
+                Collections.addAll(_movies, movies);
+                notifyDataSetChanged();
+            }
+        });
+
+        _getMoviesTask.execute();
+    }
+
+    private void cancel(GetMoviesTask getMoviesTask)
+    {
+        if (getMoviesTask == null)
+        {
+            return;
+        }
+
+        switch (getMoviesTask.getStatus())
+        {
+            case PENDING:
+            case RUNNING:
+                Log.i(LOG_TAG, "Cancelling existing task...");
+                break;
+        }
     }
 }

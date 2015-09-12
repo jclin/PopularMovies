@@ -5,4 +5,9 @@
     <string name="image_of_movie">Image of movie</string>
     <string name="title_activity_movie_details">MovieDetailsActivity</string>
     <string name="INTENT_DATA_MOVIE" translatable="false">DATA_MOVIE</string>
+    <string name="setting_sort_by_key">Setting_SortBy</string>
+    <string name="setting_sort_by_popularity" translatable="false">Setting_SortBy_Popularity</string>
+    <string name="setting_sort_by_rating" translatable="false">Setting_SortBy_Rating</string>
+    <string name="spinner_popularity">Popularity</string>
+    <string name="spinner_rating">Rating</string>
 </resources>

@@ -15,8 +15,9 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 
-import com.jclin.popularmovies.data.GetMoviesTask;
 import com.jclin.popularmovies.data.Movie;
+import com.jclin.popularmovies.data.Settings;
+import com.jclin.popularmovies.data.SortOrder;
 
 import java.util.ArrayList;
 
@@ -27,6 +28,8 @@ public class MoviesActivityFragment extends Fragment
 
     private ImageAdapter _imageAdapter;
     private ArrayList<Movie> _cachedMovies;
+    private ArrayAdapter<CharSequence> _sortingSpinnerAdapter;
+    private ActionBar _actionBar;
 
     public MoviesActivityFragment()
     {
@@ -37,8 +40,7 @@ public class MoviesActivityFragment extends Fragment
     {
         super.onCreate(savedInstanceState);
 
-        setupAppBarSpinners();
-
+        _actionBar    = createActionBarSpinners();
         _cachedMovies = restoreMoviesState(savedInstanceState);
     }
 
@@ -48,10 +50,32 @@ public class MoviesActivityFragment extends Fragment
         View fragmentView = inflater.inflate(R.layout.fragment_movies, container, false);
 
         GridView gridView = (GridView) fragmentView.findViewById(R.id.gridView);
-
         setupGridViewLayout(gridView);
 
-        _imageAdapter = new ImageAdapter(getActivity(), new GetMoviesTask(), _cachedMovies);
+        _actionBar.setListNavigationCallbacks(_sortingSpinnerAdapter, new ActionBar.OnNavigationListener()
+        {
+            @Override
+            public boolean onNavigationItemSelected(int itemPosition, long itemId)
+            {
+                String spinnerString = (String) _sortingSpinnerAdapter.getItem(itemPosition);
+                if (updateSortSettingFrom(spinnerString))
+                {
+                    _imageAdapter.sortBy(Settings.getSortOrder(getActivity()));
+                    return true;
+                }
+
+                return false;
+            }
+        });
+
+        restoreActionBarSelectedItem(_actionBar);
+
+        Context context = getActivity();
+        _imageAdapter = new ImageAdapter(
+            context,
+            _cachedMovies,
+            Settings.getSortOrder(context)
+            );
 
         gridView.setAdapter(_imageAdapter);
         gridView.setOnItemClickListener(new OnItemClickListener());
@@ -96,7 +120,7 @@ public class MoviesActivityFragment extends Fragment
         });
     }
 
-    private void setupAppBarSpinners()
+    private ActionBar createActionBarSpinners()
     {
         AppCompatActivity activity = (AppCompatActivity)getActivity();
 
@@ -104,10 +128,10 @@ public class MoviesActivityFragment extends Fragment
         if (themedContext == null)
         {
             Log.w(LOG_TAG, "Could not setup app bar spinners.");
-            return;
+            return null;
         }
 
-        ArrayAdapter<CharSequence> sortingSpinnerAdapter = ArrayAdapter.createFromResource(
+        _sortingSpinnerAdapter = ArrayAdapter.createFromResource(
                 themedContext,
                 R.array.movie_sorting_values,
                 R.layout.support_simple_spinner_dropdown_item
@@ -115,15 +139,8 @@ public class MoviesActivityFragment extends Fragment
 
         ActionBar actionBar = activity.getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-        actionBar.setListNavigationCallbacks(sortingSpinnerAdapter, new ActionBar.OnNavigationListener()
-        {
-            @Override
-            public boolean onNavigationItemSelected(int itemPosition, long itemId)
-            {
-                // TODO: Execute query on The Movie DB
-                return false;
-            }
-        });
+
+        return actionBar;
     }
 
     private ArrayList<Movie> restoreMoviesState(Bundle savedInstanceState)
@@ -135,6 +152,29 @@ public class MoviesActivityFragment extends Fragment
         }
 
         return savedInstanceState.getParcelableArrayList(MOVIES_STATE_TAG);
+    }
+
+    private boolean updateSortSettingFrom(String spinnerString)
+    {
+        if (spinnerString.equals(getResources().getString(R.string.spinner_popularity)))
+        {
+            Settings.setSortOrder(getActivity(), SortOrder.Popularity);
+            return true;
+        }
+
+        if (spinnerString.equals(getResources().getString(R.string.spinner_rating)))
+        {
+            Settings.setSortOrder(getActivity(), SortOrder.Rating);
+            return true;
+        }
+
+        return false;
+    }
+
+    private void restoreActionBarSelectedItem(ActionBar actionBar)
+    {
+        SortOrder sortOrder = Settings.getSortOrder(getActivity());
+        actionBar.setSelectedNavigationItem(sortOrder == SortOrder.Popularity ? 0 : 1);
     }
 
     private final class OnItemClickListener implements AdapterView.OnItemClickListener

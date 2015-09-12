@@ -15,15 +15,22 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
-public final class GetMoviesTask extends AsyncTask<SortOrder, Integer, Movie[]>
+public final class GetMoviesTask extends AsyncTask<Void, Integer, Movie[]>
 {
     private static final String LOG_TAG = GetMoviesTask.class.getName();
 
+    private final SortOrder _sortOrder;
+
     private OnMoviesRetrievedListener _moviesRetrievedListener;
 
-    protected Movie[] doInBackground(SortOrder... params)
+    public GetMoviesTask(SortOrder sortOrder)
     {
-        String jsonResponse = HttpRequester.send(buildRequest(params[0]));
+        _sortOrder = sortOrder;
+    }
+
+    protected Movie[] doInBackground(Void... params)
+    {
+        String jsonResponse = HttpRequester.send(buildRequest(_sortOrder));
 
         JSONObject jsonObj = toJsonObject(jsonResponse);
         if (jsonObj == null)
@@ -44,7 +51,7 @@ public final class GetMoviesTask extends AsyncTask<SortOrder, Integer, Movie[]>
     }
 
     @NonNull
-    private Uri buildRequest(SortOrder param)
+    private Uri buildRequest(SortOrder sortOrder)
     {
         return new Uri.Builder()
             .scheme("http")
@@ -52,7 +59,7 @@ public final class GetMoviesTask extends AsyncTask<SortOrder, Integer, Movie[]>
             .appendPath("3")
             .appendPath("discover")
             .appendPath("movie")
-            .appendQueryParameter("sort_by", param.getQueryParam())
+            .appendQueryParameter("sort_by", sortOrder.getQueryParam())
             .appendQueryParameter("api_key", BuildConfig.THE_MOVIE_DB_API_KEY)
             .build();
     }
@@ -63,7 +70,8 @@ public final class GetMoviesTask extends AsyncTask<SortOrder, Integer, Movie[]>
         try
         {
             jsonObj = new JSONObject(rawJson);
-        } catch (JSONException e)
+        }
+        catch (JSONException e)
         {
             e.printStackTrace();
             Log.e(LOG_TAG, "Error making JSON object", e);
