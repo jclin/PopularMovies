@@ -73,7 +73,7 @@ public final class ImageAdapter extends BaseAdapter
     @Override
     public Object getItem(int position)
     {
-        return R.drawable.minions;
+        return _movies.get(position);
     }
 
     @Override
@@ -106,12 +106,15 @@ public final class ImageAdapter extends BaseAdapter
             imageView.setLayoutParams(_imageViewLayoutParams);
         }
 
-        Picasso
-            .with(_context)
-            .load(TheMovieDBImageUri.buildFor(_movies.get(position).getPosterPath()))
+        // TODO: turn off indicators when ready to submit
+        Picasso picasso = Picasso.with(_context);
+
+        picasso.setIndicatorsEnabled(true);
+
+        picasso.load(TheMovieDBImageUri.buildFor(_movies.get(position).getPosterPath()))
             .resize(_itemPixelWidth, _itemPixelHeight)
             .centerInside()
-            .error(R.drawable.minions)
+            .error(R.drawable.error_fetch_movie_poster)
             .into(imageView);
 
         return imageView;

@@ -86,7 +86,7 @@ public class MovieDetailsActivityFragment extends Fragment
                 .load(TheMovieDBImageUri.buildFor(_movie.getPosterPath()))
                 .resize(pixelWidth, pixelHeight)
                 .centerInside()
-                .error(R.drawable.minions)
+                .error(R.drawable.error_fetch_movie_poster)
                 .into(imageView);
         }
     }
