@@ -3,6 +3,7 @@ package com.jclin.popularmovies.data;
 import android.content.Context;
 import android.preference.PreferenceManager;
 
+import com.jclin.popularmovies.App;
 import com.jclin.popularmovies.R;
 
 public final class Settings
@@ -11,8 +12,10 @@ public final class Settings
     {
     }
 
-    public static SortOrder getSortOrder(Context context)
+    public static SortOrder getSortOrder()
     {
+        Context context = App.getContext();
+
         String sortSettingString = PreferenceManager
             .getDefaultSharedPreferences(context)
             .getString(
@@ -23,8 +26,10 @@ public final class Settings
         return SortOrder.fromSettingString(context, sortSettingString);
     }
 
-    public static void setSortOrder(Context context, SortOrder orderBy)
+    public static void setSortOrder(SortOrder orderBy)
     {
+        Context context = App.getContext();
+
         PreferenceManager
             .getDefaultSharedPreferences(context)
             .edit()

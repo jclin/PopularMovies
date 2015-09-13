@@ -70,7 +70,7 @@ public class MovieDetailsActivityFragment extends Fragment
                     .getResources()
                     .getDimensionPixelSize(R.dimen.image_movie_poster_width);
 
-            int pixelHeight = ImageSize.pixelHeightFrom(getActivity(), pixelWidth);
+            int pixelHeight = ImageSize.pixelHeightFrom(pixelWidth);
 
             if (imageView.getLayoutParams().height == pixelHeight)
             {

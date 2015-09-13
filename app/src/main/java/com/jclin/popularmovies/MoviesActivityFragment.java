@@ -60,7 +60,7 @@ public class MoviesActivityFragment extends Fragment
                 String spinnerString = (String) _sortingSpinnerAdapter.getItem(itemPosition);
                 if (updateSortSettingFrom(spinnerString))
                 {
-                    _imageAdapter.sortBy(Settings.getSortOrder(getActivity()));
+                    _imageAdapter.sortBy(Settings.getSortOrder());
                     return true;
                 }
 
@@ -74,7 +74,7 @@ public class MoviesActivityFragment extends Fragment
         _imageAdapter = new ImageAdapter(
             context,
             _cachedMovies,
-            Settings.getSortOrder(context)
+            Settings.getSortOrder()
             );
 
         gridView.setAdapter(_imageAdapter);
@@ -158,13 +158,13 @@ public class MoviesActivityFragment extends Fragment
     {
         if (spinnerString.equals(getResources().getString(R.string.spinner_popularity)))
         {
-            Settings.setSortOrder(getActivity(), SortOrder.Popularity);
+            Settings.setSortOrder(SortOrder.Popularity);
             return true;
         }
 
         if (spinnerString.equals(getResources().getString(R.string.spinner_rating)))
         {
-            Settings.setSortOrder(getActivity(), SortOrder.Rating);
+            Settings.setSortOrder(SortOrder.Rating);
             return true;
         }
 
@@ -173,7 +173,7 @@ public class MoviesActivityFragment extends Fragment
 
     private void restoreActionBarSelectedItem(ActionBar actionBar)
     {
-        SortOrder sortOrder = Settings.getSortOrder(getActivity());
+        SortOrder sortOrder = Settings.getSortOrder();
         actionBar.setSelectedNavigationItem(sortOrder == SortOrder.Popularity ? 0 : 1);
     }
 

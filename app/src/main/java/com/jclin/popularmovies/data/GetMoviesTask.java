@@ -65,18 +65,18 @@ public final class GetMoviesTask extends AsyncTask<Void, Integer, Movie[]>
         ArrayList<Movie> movies = new ArrayList<>();
         try
         {
-            JSONArray results = jsonObj.getJSONArray(MovieConsts.TAG_RESULTS);
+            JSONArray results = jsonObj.getJSONArray(MovieJsonTags.TAG_RESULTS);
             for (int i = 0; i < results.length(); i++)
             {
                 JSONObject movieObj = results.getJSONObject(i);
 
                 movies.add(new Movie(
-                    movieObj.getLong(MovieConsts.TAG_ID),
-                    ValidatedJson.parseString(movieObj, MovieConsts.TAG_ORIGINAL_TITLE),
-                    ValidatedJson.parseString(movieObj, MovieConsts.TAG_OVERVIEW),
-                    ValidatedJson.parseString(movieObj, MovieConsts.TAG_POSTER_PATH).replace("/", ""),
-                    movieObj.getDouble(MovieConsts.TAG_VOTE_AVERAGE),
-                    ValidatedJson.parseDate(movieObj, MovieConsts.TAG_RELEASE_DATE)
+                    movieObj.getLong(MovieJsonTags.TAG_ID),
+                    ValidatedJson.parseString(movieObj, MovieJsonTags.TAG_ORIGINAL_TITLE),
+                    ValidatedJson.parseString(movieObj, MovieJsonTags.TAG_OVERVIEW),
+                    ValidatedJson.parseString(movieObj, MovieJsonTags.TAG_POSTER_PATH).replace("/", ""),
+                    movieObj.getDouble(MovieJsonTags.TAG_VOTE_AVERAGE),
+                    ValidatedJson.parseDate(movieObj, MovieJsonTags.TAG_RELEASE_DATE)
                     )
                 );
             }
