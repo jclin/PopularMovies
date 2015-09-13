@@ -128,7 +128,7 @@ public final class ImageAdapter extends BaseAdapter
         }
 
         _itemPixelWidth  = itemPixelWidth;
-        _itemPixelHeight = ImageSize.pixelHeightFrom(_context, itemPixelWidth);
+        _itemPixelHeight = ImageSize.pixelHeightFrom(itemPixelWidth);
 
         _imageViewLayoutParams = new GridView.LayoutParams(_itemPixelWidth, _itemPixelHeight);
 

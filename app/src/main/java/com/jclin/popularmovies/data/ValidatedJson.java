@@ -39,7 +39,7 @@ public final class ValidatedJson
         Date date = null;
         try
         {
-            date = new SimpleDateFormat(MovieConsts.DATE_FORMAT, Locale.US).parse(dateString);
+            date = new SimpleDateFormat(MovieJsonTags.DATE_FORMAT, Locale.US).parse(dateString);
         }
         catch (ParseException e)
         {

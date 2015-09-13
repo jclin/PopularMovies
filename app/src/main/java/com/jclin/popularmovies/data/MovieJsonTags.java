@@ -1,6 +1,6 @@
 package com.jclin.popularmovies.data;
 
-public final class MovieConsts
+public final class MovieJsonTags
 {
     public static final String TAG_RESULTS        = "results";
     public static final String TAG_ID             = "id";
@@ -12,7 +12,7 @@ public final class MovieConsts
 
     public static final String DATE_FORMAT        = "yyyy-MM-dd";
 
-    private MovieConsts()
+    private MovieJsonTags()
     {
     }
 }
