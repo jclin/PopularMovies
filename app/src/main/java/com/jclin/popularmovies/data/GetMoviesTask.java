@@ -1,18 +1,12 @@
 package com.jclin.popularmovies.data;
 
-import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.jclin.popularmovies.BuildConfig;
-
-import org.json.JSONObject;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 public final class GetMoviesTask extends AsyncTask<Void, Integer, Movie[]>
@@ -30,7 +24,7 @@ public final class GetMoviesTask extends AsyncTask<Void, Integer, Movie[]>
 
     protected Movie[] doInBackground(Void... params)
     {
-        String jsonResponse = HttpRequester.send(buildRequest(_sortOrder));
+        String jsonResponse = HttpRequester.send(TheMovieDBUri.buildForMovies(_sortOrder));
 
         JSONObject jsonObj = toJsonObject(jsonResponse);
         if (jsonObj == null)
@@ -48,20 +42,6 @@ public final class GetMoviesTask extends AsyncTask<Void, Integer, Movie[]>
         {
             _moviesRetrievedListener.onMoviesRetrieved(movies);
         }
-    }
-
-    @NonNull
-    private Uri buildRequest(SortOrder sortOrder)
-    {
-        return new Uri.Builder()
-            .scheme("http")
-            .authority("api.themoviedb.org")
-            .appendPath("3")
-            .appendPath("discover")
-            .appendPath("movie")
-            .appendQueryParameter("sort_by", sortOrder.getQueryParam())
-            .appendQueryParameter("api_key", BuildConfig.THE_MOVIE_DB_API_KEY)
-            .build();
     }
 
     private JSONObject toJsonObject(String rawJson)
@@ -92,11 +72,11 @@ public final class GetMoviesTask extends AsyncTask<Void, Integer, Movie[]>
 
                 movies.add(new Movie(
                     movieObj.getLong(MovieConsts.TAG_ID),
-                    movieObj.getString(MovieConsts.TAG_ORIGINAL_TITLE),
-                    movieObj.getString(MovieConsts.TAG_OVERVIEW),
-                    movieObj.getString(MovieConsts.TAG_POSTER_PATH).replace("/", ""),
+                    ValidatedJson.parseString(movieObj, MovieConsts.TAG_ORIGINAL_TITLE),
+                    ValidatedJson.parseString(movieObj, MovieConsts.TAG_OVERVIEW),
+                    ValidatedJson.parseString(movieObj, MovieConsts.TAG_POSTER_PATH).replace("/", ""),
                     movieObj.getDouble(MovieConsts.TAG_VOTE_AVERAGE),
-                    new SimpleDateFormat(MovieConsts.DATE_FORMAT).parse(movieObj.getString(MovieConsts.TAG_RELEASE_DATE))
+                    ValidatedJson.parseDate(movieObj, MovieConsts.TAG_RELEASE_DATE)
                     )
                 );
             }
@@ -105,11 +85,6 @@ public final class GetMoviesTask extends AsyncTask<Void, Integer, Movie[]>
         {
             e.printStackTrace();
             Log.e(LOG_TAG, "Error with JSON object", e);
-        }
-        catch (ParseException pe)
-        {
-            pe.printStackTrace();
-            Log.e(LOG_TAG, "Error parsing JSON object", pe);
         }
 
         return movies.toArray(new Movie[movies.size()]);

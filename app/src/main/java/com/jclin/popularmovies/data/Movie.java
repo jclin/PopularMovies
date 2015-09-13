@@ -3,16 +3,24 @@ package com.jclin.popularmovies.data;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.jclin.popularmovies.App;
+import com.jclin.popularmovies.R;
+
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public final class Movie implements Parcelable
 {
+    private static final String DATE_FORMAT          = "yyyy-MM-dd";
+    private static final long UNKNOWN_RELEASE_DATE   = Long.MIN_VALUE;
+
     private final long   _id;
     private final String _originalTitle;
     private final String _overview;
     private final String _posterPath;
     private final double _voteAverage;
-    private final Date   _releaseDate;
+    private final long _releaseTimeMilliseconds;
 
     public static final Parcelable.Creator<Movie> CREATOR = new MovieParcelCreator();
 
@@ -23,12 +31,16 @@ public final class Movie implements Parcelable
 
     public String getOriginalTitle()
     {
-        return _originalTitle;
+        return _originalTitle.equals("") ?
+            App.getContext().getString(R.string.no_movie_title) :
+            _originalTitle;
     }
 
     public String getOverview()
     {
-        return _overview;
+        return _overview.equals("") ?
+            App.getContext().getString(R.string.no_movie_plot_synopsis) :
+            _overview;
     }
 
     public String getPosterPath()
@@ -41,9 +53,11 @@ public final class Movie implements Parcelable
         return _voteAverage;
     }
 
-    public Date getRelaseDate()
+    public String getReleaseDateString()
     {
-        return _releaseDate;
+        return _releaseTimeMilliseconds == UNKNOWN_RELEASE_DATE ?
+            App.getContext().getString(R.string.unknown_release_date) :
+            new SimpleDateFormat(DATE_FORMAT, Locale.US).format(new Date(_releaseTimeMilliseconds));
     }
 
     public Movie(
@@ -60,17 +74,20 @@ public final class Movie implements Parcelable
         _overview       = overview;
         _posterPath     = posterPath;
         _voteAverage    = voteAverage;
-        _releaseDate    = releaseDate;
+
+        _releaseTimeMilliseconds = releaseDate != null ?
+            releaseDate.getTime() :
+            UNKNOWN_RELEASE_DATE;
     }
 
     private Movie(Parcel source)
     {
-        _id            = source.readLong();
-        _originalTitle = source.readString();
-        _overview      = source.readString();
-        _posterPath    = source.readString();
-        _voteAverage   = source.readDouble();
-        _releaseDate    = new Date(source.readLong());
+        _id                      = source.readLong();
+        _originalTitle           = source.readString();
+        _overview                = source.readString();
+        _posterPath              = source.readString();
+        _voteAverage             = source.readDouble();
+        _releaseTimeMilliseconds = source.readLong();
     }
 
     @Override
@@ -87,7 +104,7 @@ public final class Movie implements Parcelable
         dest.writeString(_overview);
         dest.writeString(_posterPath);
         dest.writeDouble(_voteAverage);
-        dest.writeLong(_releaseDate.getTime());
+        dest.writeLong(_releaseTimeMilliseconds);
     }
 
     private static final class MovieParcelCreator implements Parcelable.Creator<Movie>

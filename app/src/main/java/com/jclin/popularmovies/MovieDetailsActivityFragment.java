@@ -13,10 +13,8 @@ import android.widget.TextView;
 
 import com.jclin.popularmovies.data.ImageSize;
 import com.jclin.popularmovies.data.Movie;
-import com.jclin.popularmovies.data.TheMovieDBImageUri;
+import com.jclin.popularmovies.data.TheMovieDBUri;
 import com.squareup.picasso.Picasso;
-
-import java.text.SimpleDateFormat;
 
 public class MovieDetailsActivityFragment extends Fragment
 {
@@ -47,7 +45,7 @@ public class MovieDetailsActivityFragment extends Fragment
     private void populateControls(View rootView, Movie movie)
     {
         ((TextView)rootView.findViewById(R.id.textView_movie_title)).setText(movie.getOriginalTitle());
-        ((TextView)rootView.findViewById(R.id.textView_release_date)).setText(new SimpleDateFormat("yyyy-MM-dd").format(movie.getRelaseDate()));
+        ((TextView)rootView.findViewById(R.id.textView_release_date)).setText(movie.getReleaseDateString());
         ((TextView)rootView.findViewById(R.id.textView_user_rating)).setText(String.format("%.1f", movie.getVoteAverage()));
         ((TextView)rootView.findViewById(R.id.textView_plot_synopsis)).setText(movie.getOverview());
     }
@@ -83,7 +81,7 @@ public class MovieDetailsActivityFragment extends Fragment
 
             Picasso
                 .with(getActivity())
-                .load(TheMovieDBImageUri.buildFor(_movie.getPosterPath()))
+                .load(TheMovieDBUri.buildForImage(_movie.getPosterPath()))
                 .resize(pixelWidth, pixelHeight)
                 .centerInside()
                 .error(R.drawable.error_fetch_movie_poster)

@@ -14,7 +14,7 @@ import com.jclin.popularmovies.data.GetMoviesTask;
 import com.jclin.popularmovies.data.ImageSize;
 import com.jclin.popularmovies.data.Movie;
 import com.jclin.popularmovies.data.SortOrder;
-import com.jclin.popularmovies.data.TheMovieDBImageUri;
+import com.jclin.popularmovies.data.TheMovieDBUri;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -111,7 +111,7 @@ public final class ImageAdapter extends BaseAdapter
 
         picasso.setIndicatorsEnabled(true);
 
-        picasso.load(TheMovieDBImageUri.buildFor(_movies.get(position).getPosterPath()))
+        picasso.load(TheMovieDBUri.buildForImage(_movies.get(position).getPosterPath()))
             .resize(_itemPixelWidth, _itemPixelHeight)
             .centerInside()
             .error(R.drawable.error_fetch_movie_poster)

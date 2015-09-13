@@ -10,4 +10,7 @@
     <string name="setting_sort_by_rating" translatable="false">Setting_SortBy_Rating</string>
     <string name="spinner_popularity">Popularity</string>
     <string name="spinner_rating">Rating</string>
+    <string name="unknown_release_date">Unknown Release Date</string>
+    <string name="no_movie_plot_synopsis">No overview provided.</string>
+    <string name="no_movie_title">No title provided</string>
 </resources>
