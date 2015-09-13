@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="movie_sorting_values">
+        <item>@string/spinner_popularity</item>
+        <item>@string/spinner_rating</item>
+    </string-array>
+</resources>

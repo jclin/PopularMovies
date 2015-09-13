@@ -1,7 +1,7 @@
 package com.jclin.popularmovies;
 
 import android.content.Context;
-import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,20 +10,36 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+import com.jclin.popularmovies.data.GetMoviesTask;
+import com.jclin.popularmovies.data.ImageSize;
+import com.jclin.popularmovies.data.Movie;
+import com.jclin.popularmovies.data.SortOrder;
+import com.jclin.popularmovies.data.TheMovieDBUri;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public final class ImageAdapter extends BaseAdapter
 {
+    private final String LOG_TAG = ImageAdapter.class.getName();
+
     private final Context _context;
-    private final Uri[] _posterImageUris;
+    private final ArrayList<Movie> _movies;
+
+    private SortOrder _sortOrder;
+    private GetMoviesTask _getMoviesTask;
 
     private int _numColumns      = 0;
     private int _itemPixelWidth  = 0;
     private int _itemPixelHeight = 0;
 
     private AbsListView.LayoutParams _imageViewLayoutParams;
+
+    public ArrayList<Movie> getMovies()
+    {
+        return _movies;
+    }
 
     public int getNumColumns()
     {
@@ -33,39 +49,31 @@ public final class ImageAdapter extends BaseAdapter
     public void setNumColumns(int numColumns)
     {
         _numColumns = numColumns;
+        notifyDataSetChanged();
     }
 
-    public ImageAdapter(Context context)
+    public ImageAdapter(Context context, ArrayList<Movie> movies, SortOrder sortOrder)
     {
-        _context = context;
+        _context   = context;
+        _sortOrder = sortOrder;
 
-        ArrayList<Uri> posterImageUris = new ArrayList<>();
-        posterImageUris.add(buildPosterImageUri("kqjL17yufvn9OVLyXYpvtyrFfak.jpg"));
-        posterImageUris.add(buildPosterImageUri("s5uMY8ooGRZOL0oe4sIvnlTsYQO.jpg"));
-        posterImageUris.add(buildPosterImageUri("7SGGUiTE6oc2fh9MjIk5M00dsQd.jpg"));
-        posterImageUris.add(buildPosterImageUri("uXZYawqUsChGSj54wcuBtEdUJbh.jpg"));
-        posterImageUris.add(buildPosterImageUri("6iQ4CMtYorKFfAmXEpAQZMnA0Qe.jpg"));
-        posterImageUris.add(buildPosterImageUri("xxOKDTQbQo7h1h7TyrQIW7u8KcJ.jpg"));
-        posterImageUris.add(buildPosterImageUri("5JU9ytZJyR3zmClGmVm9q4Geqbd.jpg"));
-        posterImageUris.add(buildPosterImageUri("t90Y3G8UGQp0f0DrP60wRu9gfrH.jpg"));
-        posterImageUris.add(buildPosterImageUri("yUlpRbbrac0GTNHZ1l20IHEcWAN.jpg"));
-        posterImageUris.add(buildPosterImageUri("aBBQSC8ZECGn6Wh92gKDOakSC8p.jpg"));
-        posterImageUris.add(buildPosterImageUri("qFC07nj9lWWmnbkS191AgFUth9J.jpg"));
-        posterImageUris.add(buildPosterImageUri("3zQvuSAUdC3mrx9vnSEpkFX0968.jpg"));
-
-        _posterImageUris = posterImageUris.toArray(new Uri[posterImageUris.size()]);
+        _movies = (movies != null) ? movies : new ArrayList<Movie>();
+        if (_movies.size() == 0)
+        {
+            fetchMovies(_sortOrder);
+        }
     }
 
     @Override
     public int getCount()
     {
-        return 12;
+        return _movies.size();
     }
 
     @Override
     public Object getItem(int position)
     {
-        return R.drawable.minions;
+        return _movies.get(position);
     }
 
     @Override
@@ -98,12 +106,15 @@ public final class ImageAdapter extends BaseAdapter
             imageView.setLayoutParams(_imageViewLayoutParams);
         }
 
-        Picasso
-            .with(_context)
-            .load(_posterImageUris[position])
+        // TODO: turn off indicators when ready to submit
+        Picasso picasso = Picasso.with(_context);
+
+        picasso.setIndicatorsEnabled(true);
+
+        picasso.load(TheMovieDBUri.buildForImage(_movies.get(position).getPosterPath()))
             .resize(_itemPixelWidth, _itemPixelHeight)
             .centerInside()
-            .error(R.drawable.minions)
+            .error(R.drawable.error_fetch_movie_poster)
             .into(imageView);
 
         return imageView;
@@ -117,30 +128,76 @@ public final class ImageAdapter extends BaseAdapter
         }
 
         _itemPixelWidth  = itemPixelWidth;
-        _itemPixelHeight = calculateItemPixelHeightFrom(itemPixelWidth);
+        _itemPixelHeight = ImageSize.pixelHeightFrom(_context, itemPixelWidth);
 
         _imageViewLayoutParams = new GridView.LayoutParams(_itemPixelWidth, _itemPixelHeight);
 
         notifyDataSetChanged();
     }
 
-    private static Uri buildPosterImageUri(String relativePath)
+    public Movie getMovie(int position)
     {
-        final String imageSizePath = "w185";
-
-        return new Uri.Builder()
-                .scheme("http")
-                .authority("image.tmdb.org")
-                .appendPath("t")
-                .appendPath("p")
-                .appendPath(imageSizePath)
-                .appendPath(relativePath)
-                .build();
+        return _movies.get(position);
     }
 
-    private int calculateItemPixelHeightFrom(int itemPixelWidth)
+    public void sortBy(SortOrder sortOrder)
     {
-        return (itemPixelWidth *_context.getResources().getInteger(R.integer.image_thumbnail_pixel_height)) /
-                _context.getResources().getInteger(R.integer.image_thumbnail_pixel_width);
+        if (sortOrder == _sortOrder)
+        {
+            return;
+        }
+
+        _movies.clear();
+
+        _sortOrder = sortOrder;
+        fetchMovies(_sortOrder);
+
+        notifyDataSetChanged();
+    }
+
+    private void fetchMovies(SortOrder sortOrder)
+    {
+        switch (sortOrder)
+        {
+            case Popularity:
+                cancel(_getMoviesTask);
+                _getMoviesTask = new GetMoviesTask(SortOrder.Popularity);
+                Log.i(LOG_TAG, "Fetching movies by popularity...");
+                break;
+
+            case Rating:
+                cancel(_getMoviesTask);
+                _getMoviesTask = new GetMoviesTask(SortOrder.Rating);
+                Log.i(LOG_TAG, "Fetching movies by rating...");
+                break;
+        }
+
+        _getMoviesTask.setOnMoviesRetrievedListener(new GetMoviesTask.OnMoviesRetrievedListener()
+        {
+            @Override
+            public void onMoviesRetrieved(Movie[] movies)
+            {
+                Collections.addAll(_movies, movies);
+                notifyDataSetChanged();
+            }
+        });
+
+        _getMoviesTask.execute();
+    }
+
+    private void cancel(GetMoviesTask getMoviesTask)
+    {
+        if (getMoviesTask == null)
+        {
+            return;
+        }
+
+        switch (getMoviesTask.getStatus())
+        {
+            case PENDING:
+            case RUNNING:
+                Log.i(LOG_TAG, "Cancelling existing task...");
+                break;
+        }
     }
 }
