@@ -1,10 +1,10 @@
 # Android Studio
 .gradle
 /local.properties
-/.idea/gradle.xml
 /.idea/misc.xml
 /.idea/workspace.xml
 /.idea/libraries
+/.idea/vcs.xml
 /build
 /captures
 
