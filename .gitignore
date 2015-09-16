@@ -1,7 +1,12 @@
+# Android Studio
 .gradle
 /local.properties
+/.idea/gradle.xml
+/.idea/misc.xml
 /.idea/workspace.xml
 /.idea/libraries
-.DS_Store
 /build
 /captures
+
+# Windows
+.DS_Store

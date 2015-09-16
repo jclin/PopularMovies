@@ -1,7 +1,6 @@
 package com.jclin.popularmovies;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,36 +9,24 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
-import com.jclin.popularmovies.data.GetMoviesTask;
 import com.jclin.popularmovies.data.ImageSize;
 import com.jclin.popularmovies.data.Movie;
+import com.jclin.popularmovies.data.MovieProvider;
+import com.jclin.popularmovies.data.OnMoviesRetrievedListener;
 import com.jclin.popularmovies.data.SortOrder;
 import com.jclin.popularmovies.data.TheMovieDBUri;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
-import java.util.Collections;
-
 public final class ImageAdapter extends BaseAdapter
 {
-    private final String LOG_TAG = ImageAdapter.class.getName();
-
     private final Context _context;
-    private final ArrayList<Movie> _movies;
-
-    private SortOrder _sortOrder;
-    private GetMoviesTask _getMoviesTask;
+    private final MovieProvider _movieProvider;
 
     private int _numColumns      = 0;
     private int _itemPixelWidth  = 0;
     private int _itemPixelHeight = 0;
 
     private AbsListView.LayoutParams _imageViewLayoutParams;
-
-    public ArrayList<Movie> getMovies()
-    {
-        return _movies;
-    }
 
     public int getNumColumns()
     {
@@ -52,28 +39,33 @@ public final class ImageAdapter extends BaseAdapter
         notifyDataSetChanged();
     }
 
-    public ImageAdapter(Context context, ArrayList<Movie> movies, SortOrder sortOrder)
+    public ImageAdapter(Context context, MovieProvider movieProvider, SortOrder sortOrder)
     {
-        _context   = context;
-        _sortOrder = sortOrder;
+        _context        = context;
+        _movieProvider  = movieProvider;
 
-        _movies = (movies != null) ? movies : new ArrayList<Movie>();
-        if (_movies.size() == 0)
+        _movieProvider.setOnMoviesRetrievedListener(new OnMoviesRetrievedListener()
         {
-            fetchMovies(_sortOrder);
-        }
+            @Override
+            public void onMoviesRetrieved(Movie[] movies, SortOrder sortedBy)
+            {
+                notifyDataSetChanged();
+            }
+        });
+
+        _movieProvider.sortBy(sortOrder);
     }
 
     @Override
     public int getCount()
     {
-        return _movies.size();
+        return _movieProvider.getCount();
     }
 
     @Override
     public Object getItem(int position)
     {
-        return _movies.get(position);
+        return _movieProvider.getAt(position);
     }
 
     @Override
@@ -111,7 +103,7 @@ public final class ImageAdapter extends BaseAdapter
 
         picasso.setIndicatorsEnabled(true);
 
-        picasso.load(TheMovieDBUri.buildForImage(_movies.get(position).getPosterPath()))
+        picasso.load(TheMovieDBUri.buildForImage(_movieProvider.getAt(position).getPosterPath()))
             .resize(_itemPixelWidth, _itemPixelHeight)
             .centerInside()
             .error(R.drawable.error_fetch_movie_poster)
@@ -137,67 +129,17 @@ public final class ImageAdapter extends BaseAdapter
 
     public Movie getMovie(int position)
     {
-        return _movies.get(position);
+        return _movieProvider.getAt(position);
     }
 
     public void sortBy(SortOrder sortOrder)
     {
-        if (sortOrder == _sortOrder)
+        if (_movieProvider.getSortOrder() == sortOrder)
         {
             return;
         }
 
-        _movies.clear();
-
-        _sortOrder = sortOrder;
-        fetchMovies(_sortOrder);
-
+        _movieProvider.sortBy(sortOrder);
         notifyDataSetChanged();
-    }
-
-    private void fetchMovies(SortOrder sortOrder)
-    {
-        switch (sortOrder)
-        {
-            case Popularity:
-                cancel(_getMoviesTask);
-                _getMoviesTask = new GetMoviesTask(SortOrder.Popularity);
-                Log.i(LOG_TAG, "Fetching movies by popularity...");
-                break;
-
-            case Rating:
-                cancel(_getMoviesTask);
-                _getMoviesTask = new GetMoviesTask(SortOrder.Rating);
-                Log.i(LOG_TAG, "Fetching movies by rating...");
-                break;
-        }
-
-        _getMoviesTask.setOnMoviesRetrievedListener(new GetMoviesTask.OnMoviesRetrievedListener()
-        {
-            @Override
-            public void onMoviesRetrieved(Movie[] movies)
-            {
-                Collections.addAll(_movies, movies);
-                notifyDataSetChanged();
-            }
-        });
-
-        _getMoviesTask.execute();
-    }
-
-    private void cancel(GetMoviesTask getMoviesTask)
-    {
-        if (getMoviesTask == null)
-        {
-            return;
-        }
-
-        switch (getMoviesTask.getStatus())
-        {
-            case PENDING:
-            case RUNNING:
-                Log.i(LOG_TAG, "Cancelling existing task...");
-                break;
-        }
     }
 }

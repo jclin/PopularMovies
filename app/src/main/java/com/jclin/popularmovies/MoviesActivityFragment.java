@@ -15,19 +15,17 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 
-import com.jclin.popularmovies.data.Movie;
+import com.jclin.popularmovies.data.MovieProvider;
 import com.jclin.popularmovies.data.Settings;
 import com.jclin.popularmovies.data.SortOrder;
 
-import java.util.ArrayList;
-
 public class MoviesActivityFragment extends Fragment
 {
-    private final String LOG_TAG          = MoviesActivityFragment.class.getName();
-    private final String MOVIES_STATE_TAG = "Movies";
+    private final String LOG_TAG            = MoviesActivityFragment.class.getName();
+    private final String MOVIE_PROVIDER_TAG = "Movie_Provider";
 
     private ImageAdapter _imageAdapter;
-    private ArrayList<Movie> _cachedMovies;
+    private MovieProvider _movieProvider;
     private ArrayAdapter<CharSequence> _sortingSpinnerAdapter;
     private ActionBar _actionBar;
 
@@ -40,8 +38,8 @@ public class MoviesActivityFragment extends Fragment
     {
         super.onCreate(savedInstanceState);
 
-        _actionBar    = createActionBarSpinners();
-        _cachedMovies = restoreMoviesState(savedInstanceState);
+        _movieProvider = restoreMovieProvider(savedInstanceState);
+        _actionBar     = createActionBarSpinners();
     }
 
     @Override
@@ -70,10 +68,9 @@ public class MoviesActivityFragment extends Fragment
 
         restoreActionBarSelectedItem(_actionBar);
 
-        Context context = getActivity();
         _imageAdapter = new ImageAdapter(
-            context,
-            _cachedMovies,
+            getActivity(),
+            _movieProvider,
             Settings.getSortOrder()
             );
 
@@ -88,7 +85,7 @@ public class MoviesActivityFragment extends Fragment
     {
         super.onSaveInstanceState(outState);
 
-        outState.putParcelableArrayList(MOVIES_STATE_TAG, _imageAdapter.getMovies());
+        outState.putParcelable(MOVIE_PROVIDER_TAG, _movieProvider);
     }
 
     private void setupGridViewLayout(final GridView gridView)
@@ -143,15 +140,15 @@ public class MoviesActivityFragment extends Fragment
         return actionBar;
     }
 
-    private ArrayList<Movie> restoreMoviesState(Bundle savedInstanceState)
+    private MovieProvider restoreMovieProvider(Bundle savedInstanceState)
     {
-        if (savedInstanceState == null || !savedInstanceState.containsKey(MOVIES_STATE_TAG))
+        if (savedInstanceState == null || !savedInstanceState.containsKey(MOVIE_PROVIDER_TAG))
         {
-            Log.e(LOG_TAG, "Did you forget to save the list of retrieved movies?");
-            return new ArrayList<>();
+            Log.e(LOG_TAG, "Did you forget to save the movie provider?");
+            return new MovieProvider();
         }
 
-        return savedInstanceState.getParcelableArrayList(MOVIES_STATE_TAG);
+        return savedInstanceState.getParcelable(MOVIE_PROVIDER_TAG);
     }
 
     private boolean updateSortSettingFrom(String spinnerString)

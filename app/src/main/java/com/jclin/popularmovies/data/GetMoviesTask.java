@@ -40,7 +40,7 @@ public final class GetMoviesTask extends AsyncTask<Void, Integer, Movie[]>
     {
         if (_moviesRetrievedListener != null)
         {
-            _moviesRetrievedListener.onMoviesRetrieved(movies);
+            _moviesRetrievedListener.onMoviesRetrieved(movies, _sortOrder);
         }
     }
 
@@ -88,11 +88,6 @@ public final class GetMoviesTask extends AsyncTask<Void, Integer, Movie[]>
         }
 
         return movies.toArray(new Movie[movies.size()]);
-    }
-
-    public interface OnMoviesRetrievedListener
-    {
-        void onMoviesRetrieved(Movie[] movies);
     }
 
     public void setOnMoviesRetrievedListener(OnMoviesRetrievedListener listener)
