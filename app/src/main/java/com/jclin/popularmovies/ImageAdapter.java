@@ -9,13 +9,13 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+import com.jclin.popularmovies.data.ImageProvider;
 import com.jclin.popularmovies.data.ImageSize;
 import com.jclin.popularmovies.data.Movie;
 import com.jclin.popularmovies.data.MovieProvider;
 import com.jclin.popularmovies.data.OnMoviesRetrievedListener;
 import com.jclin.popularmovies.data.SortOrder;
 import com.jclin.popularmovies.data.TheMovieDBUri;
-import com.squareup.picasso.Picasso;
 
 public final class ImageAdapter extends BaseAdapter
 {
@@ -98,16 +98,12 @@ public final class ImageAdapter extends BaseAdapter
             imageView.setLayoutParams(_imageViewLayoutParams);
         }
 
-        // TODO: turn off indicators when ready to submit
-        Picasso picasso = Picasso.with(_context);
-
-        picasso.setIndicatorsEnabled(true);
-
-        picasso.load(TheMovieDBUri.buildForImage(_movieProvider.getAt(position).getPosterPath()))
-            .resize(_itemPixelWidth, _itemPixelHeight)
-            .centerInside()
-            .error(R.drawable.error_fetch_movie_poster)
-            .into(imageView);
+        ImageProvider.beginLoadFor(
+            TheMovieDBUri.buildForImage(_movieProvider.getAt(position).getPosterPath()),
+            _itemPixelWidth,
+            _itemPixelHeight,
+            imageView
+        );
 
         return imageView;
     }
