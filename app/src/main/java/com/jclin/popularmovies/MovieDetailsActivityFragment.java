@@ -11,10 +11,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.jclin.popularmovies.data.ImageProvider;
 import com.jclin.popularmovies.data.ImageSize;
 import com.jclin.popularmovies.data.Movie;
 import com.jclin.popularmovies.data.TheMovieDBUri;
-import com.squareup.picasso.Picasso;
 
 public class MovieDetailsActivityFragment extends Fragment
 {
@@ -79,13 +79,12 @@ public class MovieDetailsActivityFragment extends Fragment
 
             imageView.setLayoutParams(new LinearLayout.LayoutParams(pixelWidth, pixelHeight));
 
-            Picasso
-                .with(getActivity())
-                .load(TheMovieDBUri.buildForImage(_movie.getPosterPath()))
-                .resize(pixelWidth, pixelHeight)
-                .centerInside()
-                .error(R.drawable.error_fetch_movie_poster)
-                .into(imageView);
+            ImageProvider.beginLoadFor(
+                    TheMovieDBUri.buildForImage(_movie.getPosterPath()),
+                    pixelWidth,
+                    pixelHeight,
+                    imageView
+            );
         }
     }
 }
