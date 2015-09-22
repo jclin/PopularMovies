@@ -17,3 +17,7 @@ theMovieDbApiKey = "aaabbbcccddd"
 ```
 
 The project will fail to build if either the file or property is missing as this API key is assigned to the `BuildConfig.THE_MOVIE_DB_API_KEY` constant during compilation.
+
+## Licensing
+
+The source code is distributed under an MIT License.
