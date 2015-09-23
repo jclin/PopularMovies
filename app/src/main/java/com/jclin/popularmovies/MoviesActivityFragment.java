@@ -19,6 +19,10 @@ import com.jclin.popularmovies.data.MovieProvider;
 import com.jclin.popularmovies.data.Settings;
 import com.jclin.popularmovies.data.SortOrder;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnItemClick;
+
 public class MoviesActivityFragment extends Fragment
 {
     private final String LOG_TAG            = MoviesActivityFragment.class.getName();
@@ -28,6 +32,8 @@ public class MoviesActivityFragment extends Fragment
     private MovieProvider _movieProvider;
     private ArrayAdapter<CharSequence> _sortingSpinnerAdapter;
     private ActionBar _actionBar;
+
+    protected @Bind(R.id.gridView) GridView _gridView;
 
     public MoviesActivityFragment()
     {
@@ -47,8 +53,9 @@ public class MoviesActivityFragment extends Fragment
     {
         View fragmentView = inflater.inflate(R.layout.fragment_movies, container, false);
 
-        GridView gridView = (GridView) fragmentView.findViewById(R.id.gridView);
-        setupGridViewLayout(gridView);
+        ButterKnife.bind(this, fragmentView);
+
+        setupGridViewLayout();
 
         _actionBar.setListNavigationCallbacks(_sortingSpinnerAdapter, new ActionBar.OnNavigationListener()
         {
@@ -74,8 +81,7 @@ public class MoviesActivityFragment extends Fragment
             Settings.getSortOrder()
             );
 
-        gridView.setAdapter(_imageAdapter);
-        gridView.setOnItemClickListener(new OnItemClickListener());
+        _gridView.setAdapter(_imageAdapter);
 
         return fragmentView;
     }
@@ -88,9 +94,18 @@ public class MoviesActivityFragment extends Fragment
         outState.putParcelable(MOVIE_PROVIDER_TAG, _movieProvider);
     }
 
-    private void setupGridViewLayout(final GridView gridView)
+    @OnItemClick(R.id.gridView)
+    protected void onGridViewItemClick(AdapterView<?> parent, View view, int position, long id)
     {
-        gridView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener()
+        Intent movieDetailsIntent = new Intent(getActivity(), MovieDetailsActivity.class);
+        movieDetailsIntent.putExtra(getString(R.string.INTENT_DATA_MOVIE), _imageAdapter.getMovie(position));
+
+        startActivity(movieDetailsIntent);
+    }
+
+    private void setupGridViewLayout()
+    {
+        _gridView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener()
         {
             @Override
             public void onGlobalLayout()
@@ -104,11 +119,11 @@ public class MoviesActivityFragment extends Fragment
                 final int thumbnailPixelSpacing = getResources().getDimensionPixelSize(R.dimen.image_thumbnail_spacing);
 
                 final int numColumns =
-                        (int) (gridView.getWidth() / (float) (thumbnailPixelWidth + thumbnailPixelSpacing));
+                        (int) (_gridView.getWidth() / (float) (thumbnailPixelWidth + thumbnailPixelSpacing));
 
                 if (numColumns > 0)
                 {
-                    final int columnWidth = (gridView.getWidth() / numColumns) - thumbnailPixelSpacing;
+                    final int columnWidth = (_gridView.getWidth() / numColumns) - thumbnailPixelSpacing;
 
                     _imageAdapter.setNumColumns(numColumns);
                     _imageAdapter.setItemPixelWidth(columnWidth);
@@ -129,10 +144,10 @@ public class MoviesActivityFragment extends Fragment
         }
 
         _sortingSpinnerAdapter = ArrayAdapter.createFromResource(
-                themedContext,
-                R.array.movie_sorting_values,
-                R.layout.support_simple_spinner_dropdown_item
-        );
+            themedContext,
+            R.array.movie_sorting_values,
+            R.layout.support_simple_spinner_dropdown_item
+            );
 
         ActionBar actionBar = activity.getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
@@ -172,17 +187,5 @@ public class MoviesActivityFragment extends Fragment
     {
         SortOrder sortOrder = Settings.getSortOrder();
         actionBar.setSelectedNavigationItem(sortOrder == SortOrder.Popularity ? 0 : 1);
-    }
-
-    private final class OnItemClickListener implements AdapterView.OnItemClickListener
-    {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-        {
-            Intent movieDetailsIntent = new Intent(getActivity(), MovieDetailsActivity.class);
-            movieDetailsIntent.putExtra(getString(R.string.INTENT_DATA_MOVIE), _imageAdapter.getMovie(position));
-
-            startActivity(movieDetailsIntent);
-        }
     }
 }

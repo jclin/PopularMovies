@@ -1,6 +1,5 @@
 package com.jclin.popularmovies;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -16,8 +15,18 @@ import com.jclin.popularmovies.data.ImageSize;
 import com.jclin.popularmovies.data.Movie;
 import com.jclin.popularmovies.data.TheMovieDBUri;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 public class MovieDetailsActivityFragment extends Fragment
 {
+    protected @Bind(R.id.textView_movie_title)   TextView _movieTitleTextView;
+    protected @Bind(R.id.textView_release_date)  TextView _releaseDateTextView;
+    protected @Bind(R.id.textView_user_rating)   TextView _userRatingTextView;
+    protected @Bind(R.id.textView_plot_synopsis) TextView _plotSynopsisTextView;
+
+    protected @Bind(R.id.root_linear_layout) LinearLayout _rootLinearLayout;
+
     public MovieDetailsActivityFragment()
     {
     }
@@ -28,26 +37,32 @@ public class MovieDetailsActivityFragment extends Fragment
     {
         View view = inflater.inflate(R.layout.fragment_movie_details, container, false);
 
-        Intent movieDetailsIntent = getActivity().getIntent();
+        ButterKnife.bind(this, view);
 
-        Movie movie = movieDetailsIntent.getParcelableExtra(getString(R.string.INTENT_DATA_MOVIE));
+        Movie movie = getMovieFromIntent();
 
-        populateControls(view, movie);
+        populateControls(movie);
 
-        LinearLayout rootLinearLayout = (LinearLayout)view.findViewById(R.id.gridView_root);
-        rootLinearLayout
+        _rootLinearLayout
             .getViewTreeObserver()
-            .addOnGlobalLayoutListener(new ImageViewHeightAdjuster(rootLinearLayout, movie));
+            .addOnGlobalLayoutListener(new ImageViewHeightAdjuster(_rootLinearLayout, movie));
 
         return view;
     }
 
-    private void populateControls(View rootView, Movie movie)
+    private Movie getMovieFromIntent()
     {
-        ((TextView)rootView.findViewById(R.id.textView_movie_title)).setText(movie.getOriginalTitle());
-        ((TextView)rootView.findViewById(R.id.textView_release_date)).setText(movie.getReleaseDateString());
-        ((TextView)rootView.findViewById(R.id.textView_user_rating)).setText(String.format("%.1f", movie.getVoteAverage()));
-        ((TextView)rootView.findViewById(R.id.textView_plot_synopsis)).setText(movie.getOverview());
+        return getActivity()
+                .getIntent()
+            .getParcelableExtra(getString(R.string.INTENT_DATA_MOVIE));
+    }
+
+    private void populateControls(Movie movie)
+    {
+        _movieTitleTextView.setText(movie.getOriginalTitle());
+        _releaseDateTextView.setText(movie.getReleaseDateString());
+        _userRatingTextView.setText(String.format("%.1f", movie.getVoteAverage()));
+        _plotSynopsisTextView.setText(movie.getOverview());
     }
 
     private final class ImageViewHeightAdjuster implements ViewTreeObserver.OnGlobalLayoutListener
