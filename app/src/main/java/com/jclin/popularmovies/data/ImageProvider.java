@@ -20,12 +20,9 @@ public final class ImageProvider
         ImageView targetView
         )
     {
-        // TODO: turn off indicators when ready to submit
-        Picasso picasso = Picasso.with(App.getContext());
-
-        picasso.setIndicatorsEnabled(true);
-
-        picasso.load(imageUri)
+        Picasso
+            .with(App.getContext())
+            .load(imageUri)
             .resize(pixelWidth, pixelHeight)
             .centerInside()
             .placeholder(R.drawable.image_loading_placeholder)
