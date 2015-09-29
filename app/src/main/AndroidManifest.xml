@@ -14,7 +14,7 @@
         android:theme="@style/AppTheme"
         >
         <activity
-            android:name=".MoviesActivity"
+            android:name=".activities.MoviesActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
             >
@@ -24,15 +24,22 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MovieDetailsActivity"
+            android:name=".activities.MovieDetailsActivity"
             android:label="@string/title_activity_movie_details"
-            android:parentActivityName=".MoviesActivity"
+            android:parentActivityName=".activities.MoviesActivity"
             >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.jclin.popularmovies.MoviesActivity"
+                android:value=".activities.MoviesActivity"
                 />
         </activity>
+
+        <provider
+            android:name=".contentProviders.MoviesContentProvider"
+            android:authorities="com.jclin.popularmovies"
+            android:exported="false"
+            android:syncable="true"
+            />
     </application>
 
 </manifest>
