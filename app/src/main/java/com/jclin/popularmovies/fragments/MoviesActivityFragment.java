@@ -1,6 +1,7 @@
 package com.jclin.popularmovies.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -16,9 +17,12 @@ import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
+import android.widget.ImageView;
 
 import com.jclin.popularmovies.R;
+import com.jclin.popularmovies.activities.MovieDetailsActivity;
 import com.jclin.popularmovies.adapters.ImageAdapter;
+import com.jclin.popularmovies.data.Movie;
 import com.jclin.popularmovies.data.Settings;
 import com.jclin.popularmovies.data.SortOrder;
 import com.jclin.popularmovies.loaders.LoaderFactory;
@@ -105,11 +109,12 @@ public class MoviesActivityFragment
     @OnItemClick(R.id.gridView)
     protected void onGridViewItemClick(AdapterView<?> parent, View view, int position, long id)
     {
-        // TODO: re-implement launch of movie details activity
-//        Intent movieDetailsIntent = new Intent(getActivity(), MovieDetailsActivity.class);
-//        movieDetailsIntent.putExtra(getString(R.string.INTENT_DATA_MOVIE), _imageAdapter.getMovie(position));
-//
-//        startActivity(movieDetailsIntent);
+        ImageView imageView = (ImageView)view;
+
+        Intent movieDetailsIntent = new Intent(getActivity(), MovieDetailsActivity.class);
+        movieDetailsIntent.putExtra(getString(R.string.INTENT_DATA_MOVIE), (Movie)imageView.getTag());
+
+        startActivity(movieDetailsIntent);
     }
 
     private void setupGridViewLayout()

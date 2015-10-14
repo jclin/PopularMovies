@@ -147,7 +147,7 @@ public abstract class TheMovieDbUriHandler implements IContentUriHandler
                 movie.getOverview(),
                 movie.getPosterPath(),
                 movie.getVoteAverage(),
-                movie.getReleaseDateString()
+                movie.getReleaseDateMilliseconds()
             });
         }
 

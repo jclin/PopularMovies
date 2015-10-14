@@ -14,6 +14,7 @@ import com.jclin.popularmovies.R;
 import com.jclin.popularmovies.contentProviders.MovieColumns;
 import com.jclin.popularmovies.data.ImageProvider;
 import com.jclin.popularmovies.data.ImageSize;
+import com.jclin.popularmovies.data.Movie;
 import com.jclin.popularmovies.data.TheMovieDBUri;
 
 public final class ImageAdapter extends CursorAdapter
@@ -62,14 +63,15 @@ public final class ImageAdapter extends CursorAdapter
             return;
         }
 
-        String posterPath = cursor.getString(MovieColumns.PosterPath.getIndex());
+        Movie movie = makeMovie(cursor);
+        imageView.setTag(movie);
 
         ImageProvider.beginLoadFor(
-                TheMovieDBUri.buildForImage(posterPath),
-                _itemPixelWidth,
-                _itemPixelHeight,
-                imageView
-        );
+            TheMovieDBUri.buildForImage( movie.getPosterPath()),
+            _itemPixelWidth,
+            _itemPixelHeight,
+            imageView
+            );
     }
 
     public void setItemPixelWidth(int itemPixelWidth)
@@ -102,5 +104,17 @@ public final class ImageAdapter extends CursorAdapter
         }
 
         return true;
+    }
+
+    private Movie makeMovie(Cursor cursor)
+    {
+        return new Movie(
+            cursor.getLong(MovieColumns._ID.getIndex()),
+            cursor.getString(MovieColumns.OriginalTitle.getIndex()),
+            cursor.getString(MovieColumns.Overview.getIndex()),
+            cursor.getString(MovieColumns.PosterPath.getIndex()),
+            cursor.getDouble(MovieColumns.VoteAverage.getIndex()),
+            cursor.getLong(MovieColumns.ReleaseDate.getIndex())
+            );
     }
 }

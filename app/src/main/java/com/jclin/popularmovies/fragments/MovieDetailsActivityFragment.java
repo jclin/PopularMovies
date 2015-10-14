@@ -54,7 +54,7 @@ public class MovieDetailsActivityFragment extends Fragment
     private Movie getMovieFromIntent()
     {
         return getActivity()
-                .getIntent()
+            .getIntent()
             .getParcelableExtra(getString(R.string.INTENT_DATA_MOVIE));
     }
 
