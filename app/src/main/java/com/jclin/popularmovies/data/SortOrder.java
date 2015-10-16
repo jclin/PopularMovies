@@ -7,7 +7,7 @@ import com.jclin.popularmovies.loaders.LoaderIDs;
 
 public enum SortOrder
 {
-    Popularity
+    Popularity(0)
     {
         @Override
         public String getQueryParam()
@@ -28,7 +28,7 @@ public enum SortOrder
         }
     },
 
-    Rating
+    Rating(1)
     {
         @Override
         public String getQueryParam()
@@ -47,7 +47,40 @@ public enum SortOrder
         {
             return LoaderIDs.HighlyRatedMovies;
         }
+    },
+
+    Favorites(2)
+    {
+        @Override
+        public String getQueryParam()
+        {
+            return "";
+        }
+
+        @Override
+        public String toSettingString(Context context)
+        {
+            return context.getResources().getString(R.string.setting_sort_by_favorites);
+        }
+
+        @Override
+        public LoaderIDs loaderID()
+        {
+            return LoaderIDs.FavoriteMovies;
+        }
     };
+
+    private final int _index;
+
+    SortOrder(int index)
+    {
+        _index = index;
+    }
+
+    public int index()
+    {
+        return _index;
+    }
 
     public abstract String getQueryParam();
     public abstract String toSettingString(Context context);
@@ -63,6 +96,11 @@ public enum SortOrder
         if (settingString.equals(context.getResources().getString(R.string.setting_sort_by_rating)))
         {
             return SortOrder.Rating;
+        }
+
+        if (settingString.equals(context.getResources().getString(R.string.setting_sort_by_favorites)))
+        {
+            return SortOrder.Favorites;
         }
 
         throw new IllegalArgumentException("settingString is an unknown sortBy setting string");

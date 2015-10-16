@@ -3,5 +3,6 @@
     <string-array name="movie_sorting_values">
         <item>@string/spinner_popularity</item>
         <item>@string/spinner_rating</item>
+        <item>@string/spinner_favorites</item>
     </string-array>
 </resources>

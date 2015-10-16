@@ -1,5 +1,6 @@
 package com.jclin.popularmovies.contentProviders.contentUriHandlers;
 
+import android.content.Context;
 import android.content.UriMatcher;
 import android.net.Uri;
 
@@ -11,12 +12,14 @@ import java.util.Hashtable;
 
 public class ContentUriHandlerFactory
 {
+    private final Context _context;
     private final UriMatcher _uriMatcher;
     private final MoviesDbHelper _moviesDbHelper;
     private final Hashtable<UriSwitches, IContentUriHandler> _uriHandlers;
 
-    public ContentUriHandlerFactory(UriMatcher uriMatcher, MoviesDbHelper moviesDbHelper)
+    public ContentUriHandlerFactory(Context context, UriMatcher uriMatcher, MoviesDbHelper moviesDbHelper)
     {
+        _context        = context;
         _uriMatcher     = uriMatcher;
         _moviesDbHelper = moviesDbHelper;
         _uriHandlers    = new Hashtable<>();
@@ -70,7 +73,7 @@ public class ContentUriHandlerFactory
     private void addUriHandlers()
     {
         FavoriteMoviesUriHandler faveMoviesUriHandler =
-                new FavoriteMoviesUriHandler(_moviesDbHelper);
+                new FavoriteMoviesUriHandler(_context, _moviesDbHelper);
         _uriHandlers.put(UriSwitches.FavoriteMovies, faveMoviesUriHandler);
         _uriHandlers.put(UriSwitches.FavoriteMovie, faveMoviesUriHandler);
 

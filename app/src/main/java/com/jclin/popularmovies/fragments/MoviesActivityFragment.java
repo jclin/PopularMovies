@@ -97,6 +97,12 @@ public class MoviesActivityFragment
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data)
     {
+        if (LoaderIDs.parse(loader.getId()).sortOrder() != Settings.getSortOrder())
+        {
+            Log.i(LOG_TAG, "The cursor will not be swapped in, b/c it is not for the current sort order.");
+            return;
+        }
+
         _imageAdapter.swapCursor(data);
     }
 
@@ -183,13 +189,19 @@ public class MoviesActivityFragment
             return true;
         }
 
+        if (spinnerString.equals(getResources().getString(R.string.spinner_favorites)))
+        {
+            Settings.setSortOrder(SortOrder.Favorites);
+            return true;
+        }
+
         return false;
     }
 
     private void restoreActionBarSelectedItem(ActionBar actionBar)
     {
         SortOrder sortOrder = Settings.getSortOrder();
-        actionBar.setSelectedNavigationItem(sortOrder == SortOrder.Popularity ? 0 : 1);
+        actionBar.setSelectedNavigationItem(sortOrder.index());
 
         initLoaderBy(sortOrder);
     }
@@ -198,6 +210,6 @@ public class MoviesActivityFragment
     {
         getActivity()
             .getSupportLoaderManager()
-            .initLoader(sortOrder.loaderID().value(), null, this);
+            .initLoader(sortOrder.loaderID().id(), null, this);
     }
 }

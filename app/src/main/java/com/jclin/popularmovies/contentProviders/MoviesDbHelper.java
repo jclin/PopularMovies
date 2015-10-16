@@ -23,14 +23,14 @@ public final class MoviesDbHelper extends SQLiteOpenHelper
         Log.i(LOG_TAG, String.format("Creating %s database...", DatabaseName));
 
         String createTableQuery =
-            "CREATE TABLE " + MoviesContract.FavoriteMovies.TableName + " (\n" +
-            MovieColumns._ID + " INTEGER  NOT NULL PRIMARY KEY,\n" +
-            MovieColumns.OriginalTitle + " TEXT  NOT NULL,\n" +
-            MovieColumns.Overview + " TEXT  NOT NULL,\n" +
-            MovieColumns.PosterPath + " TEXT  NOT NULL,\n" +
-            MovieColumns.VoteAverage + " REAL  NOT NULL,\n" +
-            MovieColumns.ReleaseDate + " INTEGER  NULL\n" +
-            ");\n";
+            "CREATE TABLE " + MoviesContract.FavoriteMovies.TableName + " (" +
+            MovieColumns._ID.getName() + " INTEGER  NOT NULL PRIMARY KEY, " +
+            MovieColumns.OriginalTitle.getName() + " TEXT  NOT NULL, " +
+            MovieColumns.Overview.getName() + " TEXT  NOT NULL, " +
+            MovieColumns.PosterPath.getName() + " TEXT  NOT NULL, " +
+            MovieColumns.VoteAverage.getName() + " REAL  NOT NULL, " +
+            MovieColumns.ReleaseDate.getName() + " INTEGER  NULL" +
+            ");";
 
         database.execSQL(createTableQuery);
     }

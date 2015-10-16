@@ -2,6 +2,7 @@ package com.jclin.popularmovies.contentProviders.contentUriHandlers;
 
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -14,10 +15,12 @@ import com.jclin.popularmovies.contentProviders.UriSwitches;
 
 public final class FavoriteMoviesUriHandler implements IContentUriHandler
 {
+    private final Context _context;
     private final MoviesDbHelper _moviesDbHelper;
 
-    public FavoriteMoviesUriHandler(MoviesDbHelper moviesDbHelper)
+    public FavoriteMoviesUriHandler(Context context, MoviesDbHelper moviesDbHelper)
     {
+        _context        = context;
         _moviesDbHelper = moviesDbHelper;
     }
 
@@ -31,10 +34,11 @@ public final class FavoriteMoviesUriHandler implements IContentUriHandler
         String sortOrder
         )
     {
+        Cursor cursor;
         switch (uriSwitch)
         {
             case FavoriteMovie:
-                return _moviesDbHelper.getReadableDatabase().query(
+                cursor = _moviesDbHelper.getReadableDatabase().query(
                     MoviesContract.FavoriteMovies.TableName,
                     new String[] { MoviesContract.FavoriteMovies.Columns._ID },
                     whereClauseForId(),
@@ -44,8 +48,10 @@ public final class FavoriteMoviesUriHandler implements IContentUriHandler
                     sortOrder
                     );
 
+                break;
+
             case FavoriteMovies:
-                return _moviesDbHelper.getReadableDatabase().query(
+                cursor = _moviesDbHelper.getReadableDatabase().query(
                     MoviesContract.FavoriteMovies.TableName,
                     projection,
                     selection,
@@ -55,9 +61,15 @@ public final class FavoriteMoviesUriHandler implements IContentUriHandler
                     sortOrder
                     );
 
+                break;
+
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + rawUri);
         }
+
+        cursor.setNotificationUri(_context.getContentResolver(), rawUri);
+
+        return cursor;
     }
 
     @Override

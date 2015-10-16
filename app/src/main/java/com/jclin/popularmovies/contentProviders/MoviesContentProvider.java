@@ -34,7 +34,11 @@ public final class MoviesContentProvider extends ContentProvider
     @Override
     public boolean onCreate()
     {
-        _uriHandlerFactory = new ContentUriHandlerFactory(s_uriMatcher, new MoviesDbHelper(getContext()));
+        _uriHandlerFactory = new ContentUriHandlerFactory(
+            getContext(),
+            s_uriMatcher,
+            new MoviesDbHelper(getContext())
+            );
 
         return true;
     }

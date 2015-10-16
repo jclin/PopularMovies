@@ -1,38 +1,47 @@
 package com.jclin.popularmovies.loaders;
 
+import com.jclin.popularmovies.data.SortOrder;
+
 import java.security.InvalidParameterException;
 
 public enum LoaderIDs
 {
-    PopularMovies(100),
-    HighlyRatedMovies(200),
-    FavoriteMovies(300);
+    PopularMovies(100, SortOrder.Popularity),
+    HighlyRatedMovies(200, SortOrder.Rating),
+    FavoriteMovies(300, SortOrder.Favorites);
 
     private final int _id;
+    private final SortOrder _sortOrder;
 
-    public int value()
+    public int id()
     {
         return _id;
     }
 
-    LoaderIDs(int id)
+    LoaderIDs(int id, SortOrder sortOrder)
     {
-        _id = id;
+        _id        = id;
+        _sortOrder = sortOrder;
+    }
+
+    public SortOrder sortOrder()
+    {
+        return _sortOrder;
     }
 
     public static LoaderIDs parse(int id)
     {
-        if (PopularMovies.value() == id)
+        if (PopularMovies.id() == id)
         {
             return PopularMovies;
         }
 
-        if (HighlyRatedMovies.value() == id)
+        if (HighlyRatedMovies.id() == id)
         {
             return HighlyRatedMovies;
         }
 
-        if (FavoriteMovies.value() == id)
+        if (FavoriteMovies.id() == id)
         {
             return FavoriteMovies;
         }
