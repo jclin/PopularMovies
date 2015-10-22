@@ -97,7 +97,7 @@ public class MoviesActivityFragment
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data)
     {
-        if (LoaderIDs.parse(loader.getId()).sortOrder() != Settings.getSortOrder())
+        if (SortOrder.from(LoaderIDs.parse(loader.getId())) != Settings.getSortOrder())
         {
             Log.i(LOG_TAG, "The cursor will not be swapped in, b/c it is not for the current sort order.");
             return;
@@ -210,6 +210,6 @@ public class MoviesActivityFragment
     {
         getActivity()
             .getSupportLoaderManager()
-            .initLoader(sortOrder.loaderID().id(), null, this);
+            .initLoader(LoaderIDs.from(sortOrder).id(), null, this);
     }
 }

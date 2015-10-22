@@ -16,4 +16,5 @@
     <string name="no_movie_plot_synopsis">No overview provided.</string>
     <string name="no_movie_title">No title provided</string>
     <string name="favorite_movie_switch_text">Favorite:</string>
+    <string name="trailer_title_format">Trailer %s</string>
 </resources>

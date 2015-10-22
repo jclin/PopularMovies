@@ -36,7 +36,13 @@
 
         <provider
             android:name=".contentProviders.MoviesContentProvider"
-            android:authorities="com.jclin.popularmovies"
+            android:authorities="com.jclin.popularmovies.movies"
+            android:exported="false"
+            android:syncable="true"
+            />
+        <provider
+            android:name=".contentProviders.TrailersContentProvider"
+            android:authorities="com.jclin.popularmovies.trailers"
             android:exported="false"
             android:syncable="true"
             />

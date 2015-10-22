@@ -6,8 +6,8 @@ import android.net.Uri;
 
 public final class MoviesContract
 {
-    public static final String Authority    = "com.jclin.popularmovies";
-    public static final Uri BaseContentUri  = Uri.parse("content://" + Authority);
+    public static String Authority    = "com.jclin.popularmovies.movies";
+    public static Uri BaseContentUri  = Uri.parse("content://" + Authority);
 
     private MoviesContract()
     {

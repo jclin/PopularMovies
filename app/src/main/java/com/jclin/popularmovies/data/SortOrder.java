@@ -5,6 +5,8 @@ import android.content.Context;
 import com.jclin.popularmovies.R;
 import com.jclin.popularmovies.loaders.LoaderIDs;
 
+import java.security.InvalidParameterException;
+
 public enum SortOrder
 {
     Popularity(0)
@@ -19,12 +21,6 @@ public enum SortOrder
         public String toSettingString(Context context)
         {
             return context.getResources().getString(R.string.setting_sort_by_popularity);
-        }
-
-        @Override
-        public LoaderIDs loaderID()
-        {
-            return LoaderIDs.PopularMovies;
         }
     },
 
@@ -41,12 +37,6 @@ public enum SortOrder
         {
             return context.getResources().getString(R.string.setting_sort_by_rating);
         }
-
-        @Override
-        public LoaderIDs loaderID()
-        {
-            return LoaderIDs.HighlyRatedMovies;
-        }
     },
 
     Favorites(2)
@@ -61,12 +51,6 @@ public enum SortOrder
         public String toSettingString(Context context)
         {
             return context.getResources().getString(R.string.setting_sort_by_favorites);
-        }
-
-        @Override
-        public LoaderIDs loaderID()
-        {
-            return LoaderIDs.FavoriteMovies;
         }
     };
 
@@ -84,7 +68,6 @@ public enum SortOrder
 
     public abstract String getQueryParam();
     public abstract String toSettingString(Context context);
-    public abstract LoaderIDs loaderID();
 
     public static SortOrder fromSettingString(Context context, String settingString)
     {
@@ -104,5 +87,23 @@ public enum SortOrder
         }
 
         throw new IllegalArgumentException("settingString is an unknown sortBy setting string");
+    }
+
+    public static SortOrder from(LoaderIDs loaderID)
+    {
+        switch (loaderID)
+        {
+            case PopularMovies:
+                return Popularity;
+
+            case FavoriteMovies:
+                return Favorites;
+
+            case HighlyRatedMovies:
+                return Rating;
+
+            default:
+                throw new InvalidParameterException("No sort order for loader ID = " + loaderID);
+        }
     }
 }

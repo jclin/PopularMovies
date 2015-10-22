@@ -15,7 +15,7 @@ import com.jclin.popularmovies.contentProviders.MovieColumns;
 import com.jclin.popularmovies.data.ImageProvider;
 import com.jclin.popularmovies.data.ImageSize;
 import com.jclin.popularmovies.data.Movie;
-import com.jclin.popularmovies.data.TheMovieDBUri;
+import com.jclin.popularmovies.data.UriBuilder;
 
 public final class ImageAdapter extends CursorAdapter
 {
@@ -67,7 +67,7 @@ public final class ImageAdapter extends CursorAdapter
         imageView.setTag(movie);
 
         ImageProvider.beginLoadFor(
-            TheMovieDBUri.buildForImage( movie.getPosterPath()),
+            UriBuilder.buildForImage(movie.getPosterPath()),
             _itemPixelWidth,
             _itemPixelHeight,
             imageView

@@ -1,31 +1,44 @@
 package com.jclin.popularmovies.fragments;
 
+import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import com.jclin.popularmovies.R;
 import com.jclin.popularmovies.activities.MovieDetailsActivity;
+import com.jclin.popularmovies.adapters.TrailerAdapter;
+import com.jclin.popularmovies.contentProviders.TrailersContract;
 import com.jclin.popularmovies.data.FavoriteMovieQuery;
 import com.jclin.popularmovies.data.ImageProvider;
 import com.jclin.popularmovies.data.ImageSize;
 import com.jclin.popularmovies.data.Movie;
-import com.jclin.popularmovies.data.TheMovieDBUri;
+import com.jclin.popularmovies.data.UriBuilder;
+import com.jclin.popularmovies.loaders.LoaderFactory;
+import com.jclin.popularmovies.loaders.LoaderIDs;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
+import butterknife.OnItemClick;
 
-public class MovieDetailsActivityFragment extends Fragment
+public class MovieDetailsActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>
 {
     private static final String LOG_TAG     = MovieDetailsActivity.class.getName();
     private static final String MOVIE_KEY   = "MOVIE_BUNDLE_KEY";
@@ -39,6 +52,7 @@ public class MovieDetailsActivityFragment extends Fragment
     protected @Bind(R.id.root_linear_layout) LinearLayout _rootLinearLayout;
 
     private Movie _movie;
+    private TrailerAdapter _trailerAdapter;
 
     public MovieDetailsActivityFragment()
     {
@@ -47,19 +61,23 @@ public class MovieDetailsActivityFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        View view = inflater.inflate(R.layout.fragment_movie_details, container, false);
-
-        ButterKnife.bind(this, view);
+        ListView trailersListView = createTrailersListView(inflater, container);
+        ButterKnife.bind(this, trailersListView);
 
         _movie = getMovieFromIntent(savedInstanceState);
 
         populateControls(_movie);
 
+        _trailerAdapter = new TrailerAdapter(getActivity(), null, 0);
+        trailersListView.setAdapter(_trailerAdapter);
+
+        initTrailersLoader(_movie);
+
         _rootLinearLayout
             .getViewTreeObserver()
             .addOnGlobalLayoutListener(new ImageViewHeightAdjuster(_rootLinearLayout, _movie));
 
-        return view;
+        return trailersListView;
     }
 
     @Override
@@ -68,6 +86,33 @@ public class MovieDetailsActivityFragment extends Fragment
         super.onSaveInstanceState(outState);
 
         outState.putParcelable(MOVIE_KEY, _movie);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args)
+    {
+        return LoaderFactory.createFor(LoaderIDs.parse(id), getActivity(), args);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data)
+    {
+        _trailerAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader)
+    {
+        _trailerAdapter.swapCursor(null);
+    }
+
+    @OnItemClick(R.id.list_view_trailers)
+    protected void onListViewItemClick(AdapterView<?> parent, View view, int position, long id)
+    {
+        Uri youTubeTrailerUri = Uri.parse((String) view.getTag());
+        Intent viewTrailerIntent = new Intent(Intent.ACTION_VIEW, youTubeTrailerUri);
+
+        startActivity(viewTrailerIntent);
     }
 
     @OnCheckedChanged(R.id.switch_favorite)
@@ -105,6 +150,35 @@ public class MovieDetailsActivityFragment extends Fragment
         _switchFavorite.setChecked(FavoriteMovieQuery.alreadyExists(movie, getActivity().getContentResolver()));
     }
 
+    private void initTrailersLoader(Movie movie)
+    {
+        Bundle trailersLoaderArgs = new Bundle();
+        trailersLoaderArgs.putLong(TrailersContract.MOVIE_ID_BUNDLE_KEY, movie.getId());
+
+        getActivity().getSupportLoaderManager().initLoader(
+                LoaderIDs.MovieTrailers.id(),
+                trailersLoaderArgs,
+                this
+        );
+    }
+
+    @NonNull
+    private ListView createTrailersListView(LayoutInflater inflater, ViewGroup container)
+    {
+        ListView listView = (ListView) inflater.inflate(
+            R.layout.frament_movie_trailers_listview,
+            container,
+            false
+            );
+
+        listView.addHeaderView(inflater.inflate(
+            R.layout.fragment_movie_summary,
+            container)
+            );
+
+        return listView;
+    }
+
     private final class ImageViewHeightAdjuster implements ViewTreeObserver.OnGlobalLayoutListener
     {
         private final LinearLayout _rootLinearLayout;
@@ -135,7 +209,7 @@ public class MovieDetailsActivityFragment extends Fragment
             imageView.setLayoutParams(new LinearLayout.LayoutParams(pixelWidth, pixelHeight));
 
             ImageProvider.beginLoadFor(
-                    TheMovieDBUri.buildForImage(_movie.getPosterPath()),
+                    UriBuilder.buildForImage(_movie.getPosterPath()),
                     pixelWidth,
                     pixelHeight,
                     imageView
