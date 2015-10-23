@@ -53,6 +53,11 @@ public final class Movie implements Parcelable
         return _voteAverage;
     }
 
+    public long getReleaseDateMilliseconds()
+    {
+        return _releaseTimeMilliseconds;
+    }
+
     public String getReleaseDateString()
     {
         return _releaseTimeMilliseconds == UNKNOWN_RELEASE_DATE ?
@@ -69,15 +74,31 @@ public final class Movie implements Parcelable
         Date releaseDate
         )
     {
-        _id             = id;
-        _originalTitle  = originalTitle;
-        _overview       = overview;
-        _posterPath     = posterPath;
-        _voteAverage    = voteAverage;
+        this(
+            id,
+            originalTitle,
+            overview,
+            posterPath,
+            voteAverage,
+            releaseDate != null ? releaseDate.getTime() : UNKNOWN_RELEASE_DATE
+            );
+    }
 
-        _releaseTimeMilliseconds = releaseDate != null ?
-            releaseDate.getTime() :
-            UNKNOWN_RELEASE_DATE;
+    public Movie(
+        long id,
+        String originalTitle,
+        String overview,
+        String posterPath,
+        double voteAverage,
+        long releaseDateMilliseconds
+        )
+    {
+        _id                      = id;
+        _originalTitle           = originalTitle;
+        _overview                = overview;
+        _posterPath              = posterPath;
+        _voteAverage             = voteAverage;
+        _releaseTimeMilliseconds = releaseDateMilliseconds;
     }
 
     private Movie(Parcel source)

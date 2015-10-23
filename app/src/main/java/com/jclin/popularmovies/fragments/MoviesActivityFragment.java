@@ -1,9 +1,12 @@
-package com.jclin.popularmovies;
+package com.jclin.popularmovies.fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -14,22 +17,28 @@ import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
+import android.widget.ImageView;
 
-import com.jclin.popularmovies.data.MovieProvider;
+import com.jclin.popularmovies.R;
+import com.jclin.popularmovies.activities.MovieDetailsActivity;
+import com.jclin.popularmovies.adapters.ImageAdapter;
+import com.jclin.popularmovies.data.Movie;
 import com.jclin.popularmovies.data.Settings;
 import com.jclin.popularmovies.data.SortOrder;
+import com.jclin.popularmovies.loaders.LoaderFactory;
+import com.jclin.popularmovies.loaders.LoaderIDs;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnItemClick;
 
-public class MoviesActivityFragment extends Fragment
+public class MoviesActivityFragment
+    extends Fragment
+    implements ActionBar.OnNavigationListener, LoaderManager.LoaderCallbacks<Cursor>
 {
-    private final String LOG_TAG            = MoviesActivityFragment.class.getName();
-    private final String MOVIE_PROVIDER_TAG = "Movie_Provider";
+    private final String LOG_TAG = MoviesActivityFragment.class.getName();
 
     private ImageAdapter _imageAdapter;
-    private MovieProvider _movieProvider;
     private ArrayAdapter<CharSequence> _sortingSpinnerAdapter;
     private ActionBar _actionBar;
 
@@ -44,8 +53,7 @@ public class MoviesActivityFragment extends Fragment
     {
         super.onCreate(savedInstanceState);
 
-        _movieProvider = restoreMovieProvider(savedInstanceState);
-        _actionBar     = createActionBarSpinners();
+        _actionBar = createActionBarSpinners();
     }
 
     @Override
@@ -57,48 +65,60 @@ public class MoviesActivityFragment extends Fragment
 
         setupGridViewLayout();
 
-        _actionBar.setListNavigationCallbacks(_sortingSpinnerAdapter, new ActionBar.OnNavigationListener()
-        {
-            @Override
-            public boolean onNavigationItemSelected(int itemPosition, long itemId)
-            {
-                String spinnerString = (String) _sortingSpinnerAdapter.getItem(itemPosition);
-                if (updateSortSettingFrom(spinnerString))
-                {
-                    _imageAdapter.sortBy(Settings.getSortOrder());
-                    return true;
-                }
-
-                return false;
-            }
-        });
-
+        _actionBar.setListNavigationCallbacks(_sortingSpinnerAdapter, this);
         restoreActionBarSelectedItem(_actionBar);
 
-        _imageAdapter = new ImageAdapter(
-            getActivity(),
-            _movieProvider,
-            Settings.getSortOrder()
-            );
-
+        _imageAdapter = new ImageAdapter(getActivity(), null, 0);
         _gridView.setAdapter(_imageAdapter);
 
         return fragmentView;
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState)
+    public boolean onNavigationItemSelected(int itemPosition, long itemId)
     {
-        super.onSaveInstanceState(outState);
+        String spinnerString = (String) _sortingSpinnerAdapter.getItem(itemPosition);
+        if (updateSortSettingFrom(spinnerString))
+        {
+            initLoaderBy(Settings.getSortOrder());
 
-        outState.putParcelable(MOVIE_PROVIDER_TAG, _movieProvider);
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args)
+    {
+        return LoaderFactory.createFor(LoaderIDs.parse(id), getActivity(), args);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data)
+    {
+        if (SortOrder.from(LoaderIDs.parse(loader.getId())) != Settings.getSortOrder())
+        {
+            Log.i(LOG_TAG, "The cursor will not be swapped in, b/c it is not for the current sort order.");
+            return;
+        }
+
+        _imageAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader)
+    {
+        _imageAdapter.swapCursor(null);
     }
 
     @OnItemClick(R.id.gridView)
     protected void onGridViewItemClick(AdapterView<?> parent, View view, int position, long id)
     {
+        ImageView imageView = (ImageView)view;
+
         Intent movieDetailsIntent = new Intent(getActivity(), MovieDetailsActivity.class);
-        movieDetailsIntent.putExtra(getString(R.string.INTENT_DATA_MOVIE), _imageAdapter.getMovie(position));
+        movieDetailsIntent.putExtra(getString(R.string.INTENT_DATA_MOVIE), (Movie)imageView.getTag());
 
         startActivity(movieDetailsIntent);
     }
@@ -115,7 +135,7 @@ public class MoviesActivityFragment extends Fragment
                     return;
                 }
 
-                final int thumbnailPixelWidth = getResources().getDimensionPixelSize(R.dimen.image_thumbnail_width);
+                final int thumbnailPixelWidth   = getResources().getDimensionPixelSize(R.dimen.image_thumbnail_width);
                 final int thumbnailPixelSpacing = getResources().getDimensionPixelSize(R.dimen.image_thumbnail_spacing);
 
                 final int numColumns =
@@ -155,17 +175,6 @@ public class MoviesActivityFragment extends Fragment
         return actionBar;
     }
 
-    private MovieProvider restoreMovieProvider(Bundle savedInstanceState)
-    {
-        if (savedInstanceState == null || !savedInstanceState.containsKey(MOVIE_PROVIDER_TAG))
-        {
-            Log.e(LOG_TAG, "Did you forget to save the movie provider?");
-            return new MovieProvider();
-        }
-
-        return savedInstanceState.getParcelable(MOVIE_PROVIDER_TAG);
-    }
-
     private boolean updateSortSettingFrom(String spinnerString)
     {
         if (spinnerString.equals(getResources().getString(R.string.spinner_popularity)))
@@ -180,12 +189,27 @@ public class MoviesActivityFragment extends Fragment
             return true;
         }
 
+        if (spinnerString.equals(getResources().getString(R.string.spinner_favorites)))
+        {
+            Settings.setSortOrder(SortOrder.Favorites);
+            return true;
+        }
+
         return false;
     }
 
     private void restoreActionBarSelectedItem(ActionBar actionBar)
     {
         SortOrder sortOrder = Settings.getSortOrder();
-        actionBar.setSelectedNavigationItem(sortOrder == SortOrder.Popularity ? 0 : 1);
+        actionBar.setSelectedNavigationItem(sortOrder.index());
+
+        initLoaderBy(sortOrder);
+    }
+
+    private void initLoaderBy(SortOrder sortOrder)
+    {
+        getActivity()
+            .getSupportLoaderManager()
+            .initLoader(LoaderIDs.from(sortOrder).id(), null, this);
     }
 }

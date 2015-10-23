@@ -3,6 +3,10 @@ package com.jclin.popularmovies.data;
 import android.net.Uri;
 import android.util.Log;
 
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,62 +25,22 @@ public final class HttpRequester
 
     public static String send(Uri request)
     {
-        HttpURLConnection urlConnection = null;
-        BufferedReader reader = null;
+        OkHttpClient httpClient = new OkHttpClient();
+
+        Request okHttpRequest = new Request.Builder()
+                .url(request.toString())
+                .build();
+
         try
         {
-            urlConnection = (HttpURLConnection) new URL(request.toString()).openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.connect();
+            Response response = httpClient.newCall(okHttpRequest).execute();
 
-            InputStream inputStream = urlConnection.getInputStream();
-
-            StringBuilder stringBuilder = new StringBuilder();
-            if (inputStream == null)
-            {
-                return NO_RESPONSE;
-            }
-
-            reader = new BufferedReader(new InputStreamReader(inputStream));
-
-            String line;
-            while ((line = reader.readLine()) != null)
-            {
-                stringBuilder.append(line).append("\n");
-            }
-
-            if (stringBuilder.length() == 0)
-            {
-                return NO_RESPONSE;
-            }
-
-            return stringBuilder.toString();
+            return response.body().string();
         }
         catch (IOException e)
         {
-            e.printStackTrace();
-            Log.e(LOG_TAG, "Error opening an HTTP connection", e);
+            Log.w(LOG_TAG, "Error retrieving url ", e);
+            return NO_RESPONSE;
         }
-        finally
-        {
-            if (urlConnection != null)
-            {
-                urlConnection.disconnect();
-            }
-
-            if (reader != null)
-            {
-                try
-                {
-                    reader.close();
-                }
-                catch (final IOException e)
-                {
-                    Log.e(LOG_TAG, "Error closing stream", e);
-                }
-            }
-        }
-
-        return NO_RESPONSE;
     }
 }
