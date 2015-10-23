@@ -1,13 +1,12 @@
 package com.jclin.popularmovies.contentProviders;
 
-import android.provider.BaseColumns;
-
-public abstract class MovieColumnsBase implements BaseColumns
+public abstract class MovieColumnsBase
 {
-    public static final String OriginalTitle = MovieColumns.OriginalTitle.getName();
-    public static final String Overview      = MovieColumns.Overview.getName();
-    public static final String PosterPath    = MovieColumns.PosterPath.getName();
-    public static final String VoteAverage   = MovieColumns.VoteAverage.getName();
-    public static final String ReleaseDate   = MovieColumns.ReleaseDate.getName();
-    public static final String[] Projection  = MovieColumns.projection();
+    public static final MovieColumns _ID           = MovieColumns._ID;
+    public static final MovieColumns OriginalTitle = MovieColumns.OriginalTitle;
+    public static final MovieColumns Overview      = MovieColumns.Overview;
+    public static final MovieColumns PosterPath    = MovieColumns.PosterPath;
+    public static final MovieColumns VoteAverage   = MovieColumns.VoteAverage;
+    public static final MovieColumns ReleaseDate   = MovieColumns.ReleaseDate;
+    public static final String[] Projection        = MovieColumns.projection();
 }

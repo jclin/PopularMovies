@@ -14,7 +14,7 @@ public final class TrailersContract
     public static final Uri ContentUri             = Uri.withAppendedPath(BaseContentUri, TableName);
     public static final String MOVIE_ID_BUNDLE_KEY = "MOVIE_ID";
 
-    public static final Uri contentUriFor(long movieID)
+    public static Uri contentUriFor(long movieID)
     {
         return ContentUris.withAppendedId(ContentUri, movieID);
     }

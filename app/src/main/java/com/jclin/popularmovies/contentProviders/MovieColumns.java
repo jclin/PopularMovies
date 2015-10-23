@@ -40,4 +40,4 @@ public enum MovieColumns
             ReleaseDate.getName()
         };
     }
-};
+}

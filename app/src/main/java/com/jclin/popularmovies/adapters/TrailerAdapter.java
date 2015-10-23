@@ -21,11 +21,9 @@ public final class TrailerAdapter extends CursorAdapter
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent)
     {
-        View listViewItemTrailerView = ((LayoutInflater)context
+        return ((LayoutInflater)context
             .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
             .inflate(R.layout.listview_item_trailerview, parent, false);
-
-        return listViewItemTrailerView;
     }
 
     @Override
