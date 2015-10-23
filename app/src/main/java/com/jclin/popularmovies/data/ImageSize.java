@@ -1,7 +1,5 @@
 package com.jclin.popularmovies.data;
 
-import android.content.Context;
-
 import com.jclin.popularmovies.App;
 import com.jclin.popularmovies.R;
 

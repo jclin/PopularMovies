@@ -40,7 +40,7 @@ public final class FavoriteMoviesUriHandler implements IContentUriHandler
             case FavoriteMovie:
                 cursor = _moviesDbHelper.getReadableDatabase().query(
                     MoviesContract.FavoriteMovies.TableName,
-                    new String[] { MoviesContract.FavoriteMovies.Columns._ID },
+                    new String[] { MoviesContract.FavoriteMovies.Columns._ID.getName() },
                     whereClauseForId(),
                     new String[] { String.valueOf(ContentUris.parseId(rawUri)) },
                     null,
@@ -198,7 +198,7 @@ public final class FavoriteMoviesUriHandler implements IContentUriHandler
 
     private String whereClauseForId()
     {
-        return MoviesContract.FavoriteMovies.Columns._ID + " = ?";
+        return MoviesContract.FavoriteMovies.Columns._ID.getName() + " = ?";
     }
 
     private void verify(UriSwitches uriSwitch)

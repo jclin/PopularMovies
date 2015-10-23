@@ -11,8 +11,10 @@
         android:layout_width="@dimen/play_icon_width"
         android:layout_height="@dimen/play_icon_width"
         android:layout_marginRight="@dimen/trailer_play_icon_spacing"
+        android:layout_marginEnd="@dimen/trailer_play_icon_spacing"
         android:src="@drawable/play_icon"
         android:layout_gravity="center_vertical"
+        android:contentDescription="@string/movie_poster_image_content_description"
         />
 
     <TextView
@@ -21,7 +23,9 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="@dimen/trailer_title_horizontal_spacing"
+        android:layout_marginStart="@dimen/trailer_title_horizontal_spacing"
         android:layout_marginRight="@dimen/trailer_title_horizontal_spacing"
+        android:layout_marginEnd="@dimen/trailer_title_horizontal_spacing"
         android:textAppearance="?android:attr/textAppearanceMedium"
         />
 </LinearLayout>

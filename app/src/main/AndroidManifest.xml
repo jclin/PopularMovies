@@ -26,7 +26,6 @@
         <activity
             android:name=".activities.MovieDetailsActivity"
             android:label="@string/title_activity_movie_details"
-            android:parentActivityName=".activities.MoviesActivity"
             >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

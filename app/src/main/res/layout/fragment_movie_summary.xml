@@ -12,7 +12,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/movie_title_margin"
-        android:text="Title goes here"
         android:textAppearance="?android:attr/textAppearanceLarge"
         />
 
@@ -27,12 +26,14 @@
             android:id="@+id/imageView_movie_poster"
             android:layout_width="@dimen/image_movie_poster_width"
             android:layout_height="180dp"
+            android:contentDescription="@string/movie_poster_image_content_description"
             />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/default_margin"
+            android:layout_marginStart="@dimen/default_margin"
             android:orientation="vertical"
             >
 
@@ -41,7 +42,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/movie_misc_details_margin"
-                android:text="Release date here"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 />
 
@@ -50,7 +50,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/default_margin"
-                android:text="User rating goes here"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 />
 
@@ -72,7 +71,6 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/plot_synopsis_margin"
         android:layout_marginTop="@dimen/plot_synopsis_margin"
-        android:text="Movie summary goes here"
         android:textAppearance="?android:attr/textAppearanceMedium"
         />
 
@@ -87,7 +85,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/plot_synopsis_margin"
         android:layout_marginTop="@dimen/plot_synopsis_margin"
-        android:text="Trailers:"
+        android:text="@string/trailers"
         android:textAppearance="?android:attr/textAppearanceLarge"
         />
 </LinearLayout>

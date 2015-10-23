@@ -50,12 +50,12 @@ public final class FavoriteMovieQuery
 
         ContentValues contentValues = new ContentValues();
 
-        contentValues.put(MoviesContract.FavoriteMovies.Columns._ID, movie.getId());
-        contentValues.put(MoviesContract.FavoriteMovies.Columns.OriginalTitle, movie.getOriginalTitle());
-        contentValues.put(MoviesContract.FavoriteMovies.Columns.Overview, movie.getOverview());
-        contentValues.put(MoviesContract.FavoriteMovies.Columns.PosterPath, movie.getPosterPath());
-        contentValues.put(MoviesContract.FavoriteMovies.Columns.VoteAverage, movie.getVoteAverage());
-        contentValues.put(MoviesContract.FavoriteMovies.Columns.ReleaseDate, movie.getReleaseDateMilliseconds());
+        contentValues.put(MoviesContract.FavoriteMovies.Columns._ID.getName(), movie.getId());
+        contentValues.put(MoviesContract.FavoriteMovies.Columns.OriginalTitle.getName(), movie.getOriginalTitle());
+        contentValues.put(MoviesContract.FavoriteMovies.Columns.Overview.getName(), movie.getOverview());
+        contentValues.put(MoviesContract.FavoriteMovies.Columns.PosterPath.getName(), movie.getPosterPath());
+        contentValues.put(MoviesContract.FavoriteMovies.Columns.VoteAverage.getName(), movie.getVoteAverage());
+        contentValues.put(MoviesContract.FavoriteMovies.Columns.ReleaseDate.getName(), movie.getReleaseDateMilliseconds());
 
         contentResolver.insert(
                 MoviesContract.FavoriteMovies.contentUriFor(movie.getId()),
