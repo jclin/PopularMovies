@@ -7,6 +7,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 
 import com.jclin.popularmovies.contentProviders.MoviesContract;
+import com.jclin.popularmovies.contentProviders.ReviewsContract;
 import com.jclin.popularmovies.contentProviders.TrailersContract;
 
 import java.security.InvalidParameterException;
@@ -56,6 +57,16 @@ public final class LoaderFactory
                     context,
                     TrailersContract.contentUriFor(args.getLong(TrailersContract.MOVIE_ID_BUNDLE_KEY)),
                     TrailersContract.Columns.Projection,
+                    null,
+                    null,
+                    null
+                    );
+
+            case MovieReviews:
+                return new android.support.v4.content.CursorLoader(
+                    context,
+                    ReviewsContract.contentUriFor(args.getLong(ReviewsContract.MOVIE_ID_BUNDLE_KEY)),
+                    ReviewsContract.Columns.Projection,
                     null,
                     null,
                     null

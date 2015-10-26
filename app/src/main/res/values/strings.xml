@@ -19,4 +19,6 @@
     <string name="trailer_title_format">Trailer %s</string>
     <string name="movie_poster_image_content_description">Movie poster image</string>
     <string name="trailers">Trailers:</string>
+    <string name="title_activity_movie_reviews">Reviews</string>
+    <string name="reviews_html_string"><![CDATA[<a href=\'http://127.0.0.1\'>Reviews</a>]]></string>
 </resources>

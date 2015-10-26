@@ -9,7 +9,8 @@ public enum LoaderIDs
     PopularMovies(100),
     HighlyRatedMovies(200),
     FavoriteMovies(300),
-    MovieTrailers(400);
+    MovieTrailers(400),
+    MovieReviews(500);
 
     private final int _id;
 
@@ -43,6 +44,11 @@ public enum LoaderIDs
         if (MovieTrailers.id() == id)
         {
             return MovieTrailers;
+        }
+
+        if (MovieReviews.id() == id)
+        {
+            return MovieReviews;
         }
 
         throw new InvalidParameterException("Unknown loader id = " + id);
