@@ -39,6 +39,19 @@ public final class UriBuilder
             .build();
     }
 
+    public static Uri buildForReviews(long movieId)
+    {
+        return new Uri.Builder()
+            .scheme(Protocol)
+            .authority(TheMovieDbAuthority)
+            .appendPath("3")
+            .appendPath("movie")
+            .appendPath(String.valueOf(movieId))
+            .appendPath("reviews")
+            .appendQueryParameter("api_key", BuildConfig.THE_MOVIE_DB_API_KEY)
+            .build();
+    }
+
     public static Uri buildForYouTubeVideo(String videoKey)
     {
         return new Uri.Builder()

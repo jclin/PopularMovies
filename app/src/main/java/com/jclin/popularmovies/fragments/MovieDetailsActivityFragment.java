@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,7 +24,9 @@ import android.widget.TextView;
 
 import com.jclin.popularmovies.R;
 import com.jclin.popularmovies.activities.MovieDetailsActivity;
+import com.jclin.popularmovies.activities.MovieReviewsActivity;
 import com.jclin.popularmovies.adapters.TrailerAdapter;
+import com.jclin.popularmovies.contentProviders.ReviewsContract;
 import com.jclin.popularmovies.contentProviders.TrailersContract;
 import com.jclin.popularmovies.data.FavoriteMovieQuery;
 import com.jclin.popularmovies.data.ImageProvider;
@@ -36,6 +39,7 @@ import com.jclin.popularmovies.loaders.LoaderIDs;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
+import butterknife.OnClick;
 import butterknife.OnItemClick;
 
 public class MovieDetailsActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>
@@ -48,6 +52,7 @@ public class MovieDetailsActivityFragment extends Fragment implements LoaderMana
     protected @Bind(R.id.textView_user_rating)   TextView _userRatingTextView;
     protected @Bind(R.id.textView_plot_synopsis) TextView _plotSynopsisTextView;
     protected @Bind(R.id.switch_favorite)        Switch   _switchFavorite;
+    protected @Bind(R.id.textView_reviews)       TextView _reviewsTextView;
 
     protected @Bind(R.id.root_linear_layout) LinearLayout _rootLinearLayout;
 
@@ -115,6 +120,15 @@ public class MovieDetailsActivityFragment extends Fragment implements LoaderMana
         startActivity(viewTrailerIntent);
     }
 
+    @OnClick(R.id.textView_reviews)
+    protected void onReviewsTextViewClick()
+    {
+        Intent reviewsIntent = new Intent(getActivity(), MovieReviewsActivity.class);
+        reviewsIntent.putExtra(ReviewsContract.MOVIE_ID_BUNDLE_KEY, _movie.getId());
+
+        startActivity(reviewsIntent);
+    }
+
     @OnCheckedChanged(R.id.switch_favorite)
     protected void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
     {
@@ -148,6 +162,8 @@ public class MovieDetailsActivityFragment extends Fragment implements LoaderMana
         _userRatingTextView.setText(String.format("%.1f", movie.getVoteAverage()));
         _plotSynopsisTextView.setText(movie.getOverview());
         _switchFavorite.setChecked(FavoriteMovieQuery.alreadyExists(movie, getActivity().getContentResolver()));
+
+        _reviewsTextView.setText(Html.fromHtml(getString(R.string.reviews_html_string)));
     }
 
     private void initTrailersLoader(Movie movie)

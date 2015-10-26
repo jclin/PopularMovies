@@ -46,6 +46,19 @@ public final class TheMovieDbApi
         return parseTrailers(jsonObj);
     }
 
+    public static Review[] fetchReviewsFor(long movieId)
+    {
+        String jsonResponse = HttpRequester.send(UriBuilder.buildForReviews(movieId));
+
+        JSONObject jsonObj = toJsonObject(jsonResponse);
+        if (jsonObj == null)
+        {
+            return new Review[0];
+        }
+
+        return parseReviews(jsonObj);
+    }
+
     private static JSONObject toJsonObject(String rawJson)
     {
         JSONObject jsonObj = null;
@@ -129,5 +142,30 @@ public final class TheMovieDbApi
         }
 
         return trailers.toArray(new Trailer[trailers.size()]);
+    }
+
+    private static Review[] parseReviews(JSONObject jsonObj)
+    {
+        ArrayList<Review> reviews = new ArrayList<>();
+        try
+        {
+            JSONArray results = jsonObj.getJSONArray(ReviewJsonTags.TAG_RESULTS);
+            for (int i = 0; i < results.length(); i++)
+            {
+                JSONObject reviewObj = results.getJSONObject(i);
+
+                final String author  = reviewObj.getString(ReviewJsonTags.TAG_AUTHOR);
+                final String content = reviewObj.getString(ReviewJsonTags.TAG_CONTENT);
+
+                reviews.add(new Review(i, author, content));
+            }
+        }
+        catch (JSONException e)
+        {
+            e.printStackTrace();
+            Log.e(LOG_TAG, "Error with JSON object");
+        }
+
+        return reviews.toArray(new Review[reviews.size()]);
     }
 }

@@ -9,6 +9,7 @@ public enum UriSwitches
     HighlyRatedMovies(300),
     HighlyRatedMovie(301),
     Trailers(400),
+    Reviews(500),
     Unknown(Integer.MAX_VALUE);
 
     private final int _value;
@@ -47,6 +48,9 @@ public enum UriSwitches
 
             case 400:
                 return Trailers;
+
+            case 500:
+                return Reviews;
 
             default:
                 return Unknown;

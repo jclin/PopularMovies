@@ -20,6 +20,7 @@
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
+
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
@@ -32,6 +33,16 @@
                 android:value=".activities.MoviesActivity"
                 />
         </activity>
+        <activity
+            android:name=".activities.MovieReviewsActivity"
+            android:label="@string/title_activity_movie_reviews"
+            android:theme="@style/Base.Theme.AppCompat.Light.Dialog.FixedSize"
+            >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.jclin.popularmovies.activities.MovieDetailsActivity"
+                />
+        </activity>
 
         <provider
             android:name=".contentProviders.MoviesContentProvider"
@@ -42,6 +53,12 @@
         <provider
             android:name=".contentProviders.TrailersContentProvider"
             android:authorities="com.jclin.popularmovies.trailers"
+            android:exported="false"
+            android:syncable="true"
+            />
+        <provider
+            android:name=".contentProviders.ReviewsContentProvider"
+            android:authorities="com.jclin.popularmovies.reviews"
             android:exported="false"
             android:syncable="true"
             />
