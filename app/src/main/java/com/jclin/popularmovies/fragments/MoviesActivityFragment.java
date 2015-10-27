@@ -18,6 +18,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.jclin.popularmovies.R;
 import com.jclin.popularmovies.activities.MovieDetailsActivity;
@@ -42,7 +44,9 @@ public class MoviesActivityFragment
     private ArrayAdapter<CharSequence> _sortingSpinnerAdapter;
     private ActionBar _actionBar;
 
-    protected @Bind(R.id.gridView) GridView _gridView;
+    protected @Bind(R.id.gridView)                   GridView _gridView;
+    protected @Bind(R.id.progressBar_movies_loading) ProgressBar _moviesLoadingProgressBar;
+    protected @Bind(R.id.textView_no_movies)         TextView _noMoviesTextView;
 
     public MoviesActivityFragment()
     {
@@ -59,9 +63,9 @@ public class MoviesActivityFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        View fragmentView = inflater.inflate(R.layout.fragment_movies, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_movies, container, false);
 
-        ButterKnife.bind(this, fragmentView);
+        ButterKnife.bind(this, rootView);
 
         setupGridViewLayout();
 
@@ -71,7 +75,7 @@ public class MoviesActivityFragment
         _imageAdapter = new ImageAdapter(getActivity(), null, 0);
         _gridView.setAdapter(_imageAdapter);
 
-        return fragmentView;
+        return rootView;
     }
 
     @Override
@@ -103,7 +107,11 @@ public class MoviesActivityFragment
             return;
         }
 
+        hideLoadingProgress();
+
         _imageAdapter.swapCursor(data);
+
+        _gridView.setEmptyView(_noMoviesTextView);
     }
 
     @Override
@@ -135,7 +143,7 @@ public class MoviesActivityFragment
                     return;
                 }
 
-                final int thumbnailPixelWidth   = getResources().getDimensionPixelSize(R.dimen.image_thumbnail_width);
+                final int thumbnailPixelWidth = getResources().getDimensionPixelSize(R.dimen.image_thumbnail_width);
                 final int thumbnailPixelSpacing = getResources().getDimensionPixelSize(R.dimen.image_thumbnail_spacing);
 
                 final int numColumns =
@@ -208,8 +216,23 @@ public class MoviesActivityFragment
 
     private void initLoaderBy(SortOrder sortOrder)
     {
+        showLoadingProgress();
+
         getActivity()
             .getSupportLoaderManager()
             .initLoader(LoaderIDs.from(sortOrder).id(), null, this);
+    }
+
+    private void showLoadingProgress()
+    {
+        _moviesLoadingProgressBar.setVisibility(View.VISIBLE);
+        _gridView.setVisibility(View.GONE);
+        _noMoviesTextView.setVisibility(View.GONE);
+    }
+
+    private void hideLoadingProgress()
+    {
+        _moviesLoadingProgressBar.setVisibility(View.GONE);
+        _gridView.setVisibility(View.VISIBLE);
     }
 }

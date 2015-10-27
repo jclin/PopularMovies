@@ -25,7 +25,6 @@ public final class ImageProvider
             .load(imageUri)
             .resize(pixelWidth, pixelHeight)
             .centerInside()
-            .placeholder(R.drawable.image_loading_placeholder)
             .error(R.drawable.error_fetch_movie_poster)
             .into(targetView);
     }
