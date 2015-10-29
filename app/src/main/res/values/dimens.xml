@@ -16,4 +16,5 @@
     <dimen name="play_icon_width">25dp</dimen>
     <dimen name="trailer_item_margin">15dp</dimen>
     <dimen name="trailer_title_horizontal_spacing">15dp</dimen>
+    <dimen name="movie_summary_loader_marginTop">35dp</dimen>
 </resources>

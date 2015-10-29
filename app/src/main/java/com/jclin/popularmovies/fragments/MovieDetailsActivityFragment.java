@@ -19,6 +19,7 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -47,12 +48,16 @@ public class MovieDetailsActivityFragment extends Fragment implements LoaderMana
     private static final String LOG_TAG     = MovieDetailsActivity.class.getName();
     private static final String MOVIE_KEY   = "MOVIE_BUNDLE_KEY";
 
-    protected @Bind(R.id.textView_movie_title)   TextView _movieTitleTextView;
-    protected @Bind(R.id.textView_release_date)  TextView _releaseDateTextView;
-    protected @Bind(R.id.textView_user_rating)   TextView _userRatingTextView;
-    protected @Bind(R.id.textView_plot_synopsis) TextView _plotSynopsisTextView;
-    protected @Bind(R.id.switch_favorite)        Switch   _switchFavorite;
-    protected @Bind(R.id.textView_reviews)       TextView _reviewsTextView;
+    protected @Bind(R.id.textView_movie_title)         TextView _movieTitleTextView;
+    protected @Bind(R.id.textView_release_date)        TextView _releaseDateTextView;
+    protected @Bind(R.id.textView_user_rating)         TextView _userRatingTextView;
+    protected @Bind(R.id.textView_plot_synopsis)       TextView _plotSynopsisTextView;
+    protected @Bind(R.id.switch_favorite)              Switch   _switchFavorite;
+    protected @Bind(R.id.textView_reviews)             TextView _reviewsTextView;
+
+    protected @Bind(R.id.list_view_trailers)           ListView _trailersListView;
+    protected @Bind(R.id.progressBar_trailers_loading) ProgressBar _loadingTrailersProgressBar;
+    protected @Bind(R.id.textView_no_trailers)         TextView _noTrailersTextView;
 
     protected @Bind(R.id.root_linear_layout) LinearLayout _rootLinearLayout;
 
@@ -66,23 +71,23 @@ public class MovieDetailsActivityFragment extends Fragment implements LoaderMana
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        ListView trailersListView = createTrailersListView(inflater, container);
-        ButterKnife.bind(this, trailersListView);
+        _trailersListView = createTrailersListView(inflater, container);
+        ButterKnife.bind(this, _trailersListView);
 
         _movie = getMovieFromIntent(savedInstanceState);
 
-        populateControls(_movie);
-
         _trailerAdapter = new TrailerAdapter(getActivity(), null, 0);
-        trailersListView.setAdapter(_trailerAdapter);
+        _trailersListView.setAdapter(_trailerAdapter);
 
         initTrailersLoader(_movie);
+
+        populateControls(_movie);
 
         _rootLinearLayout
             .getViewTreeObserver()
             .addOnGlobalLayoutListener(new ImageViewHeightAdjuster(_rootLinearLayout, _movie));
 
-        return trailersListView;
+        return _trailersListView;
     }
 
     @Override
@@ -103,6 +108,8 @@ public class MovieDetailsActivityFragment extends Fragment implements LoaderMana
     public void onLoadFinished(Loader<Cursor> loader, Cursor data)
     {
         _trailerAdapter.swapCursor(data);
+
+        hideLoadingProgress(_trailerAdapter.getCount());
     }
 
     @Override
@@ -168,14 +175,16 @@ public class MovieDetailsActivityFragment extends Fragment implements LoaderMana
 
     private void initTrailersLoader(Movie movie)
     {
+        showLoadingProgress();
+
         Bundle trailersLoaderArgs = new Bundle();
         trailersLoaderArgs.putLong(TrailersContract.MOVIE_ID_BUNDLE_KEY, movie.getId());
 
         getActivity().getSupportLoaderManager().initLoader(
-                LoaderIDs.MovieTrailers.id(),
-                trailersLoaderArgs,
-                this
-        );
+            LoaderIDs.MovieTrailers.id(),
+            trailersLoaderArgs,
+            this
+            );
     }
 
     @NonNull
@@ -193,6 +202,24 @@ public class MovieDetailsActivityFragment extends Fragment implements LoaderMana
             );
 
         return listView;
+    }
+
+    private void showLoadingProgress()
+    {
+        _loadingTrailersProgressBar.setVisibility(View.VISIBLE);
+        _rootLinearLayout.setVisibility(View.INVISIBLE);
+        _noTrailersTextView.setVisibility(View.GONE);
+    }
+
+    private void hideLoadingProgress(int adapterItemCount)
+    {
+        _loadingTrailersProgressBar.setVisibility(View.GONE);
+        _rootLinearLayout.setVisibility(View.VISIBLE);
+
+        if (adapterItemCount == 0)
+        {
+            _noTrailersTextView.setVisibility(View.VISIBLE);
+        }
     }
 
     private final class ImageViewHeightAdjuster implements ViewTreeObserver.OnGlobalLayoutListener
