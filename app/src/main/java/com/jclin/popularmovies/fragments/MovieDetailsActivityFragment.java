@@ -8,9 +8,15 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v4.view.ActionProvider;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.ShareActionProvider;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -33,6 +39,7 @@ import com.jclin.popularmovies.data.FavoriteMovieQuery;
 import com.jclin.popularmovies.data.ImageProvider;
 import com.jclin.popularmovies.data.ImageSize;
 import com.jclin.popularmovies.data.Movie;
+import com.jclin.popularmovies.data.TrailerShareIntent;
 import com.jclin.popularmovies.data.UriBuilder;
 import com.jclin.popularmovies.loaders.LoaderFactory;
 import com.jclin.popularmovies.loaders.LoaderIDs;
@@ -61,11 +68,33 @@ public class MovieDetailsActivityFragment extends Fragment implements LoaderMana
 
     protected @Bind(R.id.root_linear_layout) LinearLayout _rootLinearLayout;
 
+    private MenuItem _shareMenuItem;
+    private ShareActionProvider _shareActionProvider;
+
     private Movie _movie;
     private TrailerAdapter _trailerAdapter;
 
     public MovieDetailsActivityFragment()
     {
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        inflater.inflate(R.menu.fragment_movie_summary, menu);
+
+        _shareMenuItem = menu.findItem(R.id.menu_item_share_trailer);
+        _shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(_shareMenuItem);
+
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
@@ -110,6 +139,8 @@ public class MovieDetailsActivityFragment extends Fragment implements LoaderMana
         _trailerAdapter.swapCursor(data);
 
         hideLoadingProgress(_trailerAdapter.getCount());
+
+        updateShareActionProvider(data);
     }
 
     @Override
@@ -220,6 +251,22 @@ public class MovieDetailsActivityFragment extends Fragment implements LoaderMana
         {
             _noTrailersTextView.setVisibility(View.VISIBLE);
         }
+    }
+
+    private void updateShareActionProvider(Cursor trailerCursor)
+    {
+        if (!trailerCursor.moveToFirst())
+        {
+            _shareMenuItem.setVisible(false);
+            return;
+        }
+
+        Intent trailerShareIntent = TrailerShareIntent.buildWith(
+            _movie.getOriginalTitle(),
+            trailerCursor.getString(TrailersContract.Columns.YouTubeUrl.getIndex())
+            );
+
+        _shareActionProvider.setShareIntent(trailerShareIntent);
     }
 
     private final class ImageViewHeightAdjuster implements ViewTreeObserver.OnGlobalLayoutListener

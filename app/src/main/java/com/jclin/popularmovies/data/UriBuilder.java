@@ -57,8 +57,8 @@ public final class UriBuilder
         return new Uri.Builder()
             .scheme(Protocol)
             .authority("www.youtube.com")
-            .appendPath("v")
-            .appendPath(videoKey)
+            .appendPath("watch")
+            .appendQueryParameter("v", videoKey)
             .build();
     }
 
