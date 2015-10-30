@@ -92,7 +92,11 @@ public class MovieDetailsActivityFragment extends Fragment implements LoaderMana
         inflater.inflate(R.menu.fragment_movie_summary, menu);
 
         _shareMenuItem = menu.findItem(R.id.menu_item_share_trailer);
+        _shareMenuItem.setVisible(false);
+
         _shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(_shareMenuItem);
+
+        initTrailersLoader(_movie);
 
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -107,8 +111,6 @@ public class MovieDetailsActivityFragment extends Fragment implements LoaderMana
 
         _trailerAdapter = new TrailerAdapter(getActivity(), null, 0);
         _trailersListView.setAdapter(_trailerAdapter);
-
-        initTrailersLoader(_movie);
 
         populateControls(_movie);
 
@@ -257,9 +259,10 @@ public class MovieDetailsActivityFragment extends Fragment implements LoaderMana
     {
         if (!trailerCursor.moveToFirst())
         {
-            _shareMenuItem.setVisible(false);
             return;
         }
+
+        _shareMenuItem.setVisible(true);
 
         Intent trailerShareIntent = TrailerShareIntent.buildWith(
             _movie.getOriginalTitle(),
