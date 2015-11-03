@@ -1,7 +1,6 @@
 package com.jclin.popularmovies.fragments;
 
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -17,12 +16,10 @@ import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.jclin.popularmovies.R;
-import com.jclin.popularmovies.activities.MovieDetailsActivity;
 import com.jclin.popularmovies.adapters.ImageAdapter;
 import com.jclin.popularmovies.data.Movie;
 import com.jclin.popularmovies.data.Settings;
@@ -47,6 +44,11 @@ public class MoviesActivityFragment
     protected @Bind(R.id.gridView)                   GridView _gridView;
     protected @Bind(R.id.progressBar_movies_loading) ProgressBar _moviesLoadingProgressBar;
     protected @Bind(R.id.textView_no_movies)         TextView _noMoviesTextView;
+
+    public interface Callbacks
+    {
+        void onMovieSelected(Movie movie);
+    }
 
     public MoviesActivityFragment()
     {
@@ -123,12 +125,7 @@ public class MoviesActivityFragment
     @OnItemClick(R.id.gridView)
     protected void onGridViewItemClick(AdapterView<?> parent, View view, int position, long id)
     {
-        ImageView imageView = (ImageView)view;
-
-        Intent movieDetailsIntent = new Intent(getActivity(), MovieDetailsActivity.class);
-        movieDetailsIntent.putExtra(getString(R.string.INTENT_DATA_MOVIE), (Movie)imageView.getTag());
-
-        startActivity(movieDetailsIntent);
+        ((Callbacks)getActivity()).onMovieSelected((Movie) view.getTag());
     }
 
     private void setupGridViewLayout()

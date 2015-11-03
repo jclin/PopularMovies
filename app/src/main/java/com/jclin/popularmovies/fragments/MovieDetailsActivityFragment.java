@@ -8,8 +8,8 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.support.v4.view.ActionProvider;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ShareActionProvider;
 import android.text.Html;
 import android.util.Log;
@@ -94,6 +94,8 @@ public class MovieDetailsActivityFragment extends Fragment implements LoaderMana
         _shareMenuItem = menu.findItem(R.id.menu_item_share_trailer);
         _shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(_shareMenuItem);
 
+        initTrailersLoader(_movie);
+
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -103,12 +105,10 @@ public class MovieDetailsActivityFragment extends Fragment implements LoaderMana
         _trailersListView = createTrailersListView(inflater, container);
         ButterKnife.bind(this, _trailersListView);
 
-        _movie = getMovieFromIntent(savedInstanceState);
+        _movie = getMovieFromArgs(savedInstanceState);
 
         _trailerAdapter = new TrailerAdapter(getActivity(), null, 0);
         _trailersListView.setAdapter(_trailerAdapter);
-
-        initTrailersLoader(_movie);
 
         populateControls(_movie);
 
@@ -180,7 +180,7 @@ public class MovieDetailsActivityFragment extends Fragment implements LoaderMana
         }
     }
 
-    private Movie getMovieFromIntent(Bundle savedInstanceState)
+    private Movie getMovieFromArgs(Bundle savedInstanceState)
     {
         if (savedInstanceState != null)
         {
@@ -188,9 +188,7 @@ public class MovieDetailsActivityFragment extends Fragment implements LoaderMana
             _movie = savedInstanceState.getParcelable(MOVIE_KEY);
         }
 
-        return getActivity()
-            .getIntent()
-            .getParcelableExtra(getString(R.string.INTENT_DATA_MOVIE));
+        return getArguments().getParcelable(getString(R.string.INTENT_DATA_MOVIE));
     }
 
     private void populateControls(Movie movie)
@@ -229,7 +227,7 @@ public class MovieDetailsActivityFragment extends Fragment implements LoaderMana
 
         listView.addHeaderView(inflater.inflate(
             R.layout.fragment_movie_summary,
-            container)
+            null)
             );
 
         return listView;
