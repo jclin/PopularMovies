@@ -7,13 +7,10 @@ import android.support.v7.app.AppCompatActivity;
 import com.jclin.popularmovies.R;
 import com.jclin.popularmovies.data.FragmentFactory;
 import com.jclin.popularmovies.data.Movie;
-import com.jclin.popularmovies.fragments.MovieDetailsActivityFragment;
-import com.jclin.popularmovies.fragments.MoviesActivityFragment;
+import com.jclin.popularmovies.fragments.MoviesFragment;
 
-public class MoviesActivity extends AppCompatActivity implements MoviesActivityFragment.Callbacks
+public class MoviesActivity extends AppCompatActivity implements MoviesFragment.Callbacks
 {
-    private static final String MOVIE_DETAILS_FRAGMENT_TAG = "MOVIE_DETAILS_FRAGMENT";
-
     private boolean _twoPaneLayout;
 
     @Override
@@ -21,13 +18,7 @@ public class MoviesActivity extends AppCompatActivity implements MoviesActivityF
     {
         if (_twoPaneLayout)
         {
-            getSupportFragmentManager()
-                .beginTransaction()
-                .replace(
-                    R.id.movie_details_layout_container,
-                    FragmentFactory.buildMovieDetailsFragment(movie))
-                .commit();
-
+            loadMovieDetailsFragment(movie);
             return;
         }
 
@@ -38,6 +29,17 @@ public class MoviesActivity extends AppCompatActivity implements MoviesActivityF
     }
 
     @Override
+    public void onSelectionCleared()
+    {
+        if (!_twoPaneLayout)
+        {
+            return;
+        }
+
+        loadNoMovieDetailsFragment();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
@@ -45,14 +47,29 @@ public class MoviesActivity extends AppCompatActivity implements MoviesActivityF
 
         _twoPaneLayout = findViewById(R.id.movie_details_layout_container) != null;
 
-        if (!_twoPaneLayout || savedInstanceState != null)
+        if (savedInstanceState == null && _twoPaneLayout)
         {
-            return;
+            loadNoMovieDetailsFragment();
         }
+    }
 
+    private void loadMovieDetailsFragment(Movie movie)
+    {
         getSupportFragmentManager()
             .beginTransaction()
-            .replace(R.id.movie_details_layout_container, new MovieDetailsActivityFragment(), MOVIE_DETAILS_FRAGMENT_TAG)
+            .replace(
+                R.id.movie_details_layout_container,
+                FragmentFactory.buildMovieDetailsFragment(movie))
+            .commit();
+    }
+
+    private void loadNoMovieDetailsFragment()
+    {
+        getSupportFragmentManager()
+            .beginTransaction()
+            .replace(
+                R.id.movie_details_layout_container,
+                FragmentFactory.buildNoMovieDetailsFragment())
             .commit();
     }
 }

@@ -12,8 +12,8 @@ import java.util.Locale;
 
 public final class Movie implements Parcelable
 {
-    private static final String DATE_FORMAT          = "yyyy-MM-dd";
-    private static final long UNKNOWN_RELEASE_DATE   = Long.MIN_VALUE;
+    private static final String DATE_FORMAT        = "yyyy-MM-dd";
+    private static final long UNKNOWN_RELEASE_DATE = Long.MIN_VALUE;
 
     private final long   _id;
     private final String _originalTitle;

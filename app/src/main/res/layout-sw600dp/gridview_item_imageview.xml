@@ -4,6 +4,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="@dimen/image_thumbnail_width"
     android:layout_height="@dimen/image_thumbnail_height"
+    android:foreground="@drawable/movie_item_selector"
     android:paddingLeft="@dimen/image_of_movie_padding"
     android:paddingRight="@dimen/image_of_movie_padding"
     >

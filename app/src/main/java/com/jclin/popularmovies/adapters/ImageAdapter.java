@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
 
@@ -23,7 +24,7 @@ public final class ImageAdapter extends CursorAdapter
     private int _itemPixelWidth  = 0;
     private int _itemPixelHeight = 0;
 
-    private AbsListView.LayoutParams _imageViewLayoutParams;
+    private AbsListView.LayoutParams _frameLayoutLayoutParams;
 
     public int getNumColumns()
     {
@@ -44,33 +45,33 @@ public final class ImageAdapter extends CursorAdapter
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent)
     {
-        ImageView imageView = (ImageView) ((LayoutInflater) context
+        FrameLayout frameLayout = (FrameLayout) ((LayoutInflater) context
             .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
             .inflate(R.layout.gridview_item_imageview, parent, false);
 
-        tryUpdateLayoutParams(imageView);
+        tryUpdateLayoutParams(frameLayout);
 
-        return imageView;
+        return frameLayout;
     }
 
     @Override
     public void bindView(View view, Context context, Cursor cursor)
     {
-        ImageView imageView = (ImageView) view;
+        FrameLayout frameLayout = (FrameLayout) view;
 
-        if (!tryUpdateLayoutParams(imageView))
+        if (!tryUpdateLayoutParams(frameLayout))
         {
             return;
         }
 
         Movie movie = makeMovie(cursor);
-        imageView.setTag(movie);
+        frameLayout.setTag(movie);
 
         ImageProvider.beginLoadFor(
             UriBuilder.buildForImage(movie.getPosterPath()),
             _itemPixelWidth,
             _itemPixelHeight,
-            imageView
+            (ImageView) frameLayout.findViewById(R.id.gridview_item_imageView)
             );
     }
 
@@ -84,23 +85,23 @@ public final class ImageAdapter extends CursorAdapter
         _itemPixelWidth  = itemPixelWidth;
         _itemPixelHeight = ImageSize.pixelHeightFrom(itemPixelWidth);
 
-        _imageViewLayoutParams = new GridView.LayoutParams(_itemPixelWidth, _itemPixelHeight);
+        _frameLayoutLayoutParams = new GridView.LayoutParams(_itemPixelWidth, _itemPixelHeight);
 
         notifyDataSetChanged();
     }
 
-    private boolean tryUpdateLayoutParams(ImageView imageView)
+    private boolean tryUpdateLayoutParams(FrameLayout frameLayout)
     {
-        if (_imageViewLayoutParams == null)
+        if (_frameLayoutLayoutParams == null)
         {
             return false;
         }
 
-        imageView.setLayoutParams(_imageViewLayoutParams);
+        frameLayout.setLayoutParams(_frameLayoutLayoutParams);
 
-        if (imageView.getLayoutParams().height != _itemPixelHeight)
+        if (frameLayout.getLayoutParams().height != _itemPixelHeight)
         {
-            imageView.setLayoutParams(_imageViewLayoutParams);
+            frameLayout.setLayoutParams(_frameLayoutLayoutParams);
         }
 
         return true;

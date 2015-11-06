@@ -23,7 +23,7 @@ public final class Settings
                 context.getResources().getString(R.string.setting_sort_by_popularity)
             );
 
-        return SortOrder.fromSettingString(context, sortSettingString);
+        return SortOrder.fromSettingString(sortSettingString);
     }
 
     public static void setSortOrder(SortOrder orderBy)
@@ -35,7 +35,7 @@ public final class Settings
             .edit()
             .putString(
                 context.getResources().getString(R.string.setting_sort_by_key),
-                orderBy.toSettingString(context))
+                orderBy.toSettingString())
             .commit();
     }
 }

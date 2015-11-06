@@ -1,7 +1,6 @@
 package com.jclin.popularmovies.data;
 
-import android.content.Context;
-
+import com.jclin.popularmovies.App;
 import com.jclin.popularmovies.R;
 import com.jclin.popularmovies.loaders.LoaderIDs;
 
@@ -18,9 +17,15 @@ public enum SortOrder
         }
 
         @Override
-        public String toSettingString(Context context)
+        public String toSettingString()
         {
-            return context.getResources().getString(R.string.setting_sort_by_popularity);
+            return App.getContext().getResources().getString(R.string.setting_sort_by_popularity);
+        }
+
+        @Override
+        public String toString()
+        {
+            return App.getContext().getResources().getString(R.string.spinner_popularity);
         }
     },
 
@@ -33,9 +38,15 @@ public enum SortOrder
         }
 
         @Override
-        public String toSettingString(Context context)
+        public String toSettingString()
         {
-            return context.getResources().getString(R.string.setting_sort_by_rating);
+            return App.getContext().getResources().getString(R.string.setting_sort_by_rating);
+        }
+
+        @Override
+        public String toString()
+        {
+            return App.getContext().getResources().getString(R.string.spinner_rating);
         }
     },
 
@@ -48,9 +59,15 @@ public enum SortOrder
         }
 
         @Override
-        public String toSettingString(Context context)
+        public String toSettingString()
         {
-            return context.getResources().getString(R.string.setting_sort_by_favorites);
+            return App.getContext().getResources().getString(R.string.setting_sort_by_favorites);
+        }
+
+        @Override
+        public String toString()
+        {
+            return App.getContext().getResources().getString(R.string.spinner_favorites);
         }
     };
 
@@ -67,21 +84,22 @@ public enum SortOrder
     }
 
     public abstract String getQueryParam();
-    public abstract String toSettingString(Context context);
 
-    public static SortOrder fromSettingString(Context context, String settingString)
+    public abstract String toSettingString();
+
+    public static SortOrder fromSettingString(String settingString)
     {
-        if (settingString.equals(context.getResources().getString(R.string.setting_sort_by_popularity)))
+        if (settingString.equals(App.getContext().getResources().getString(R.string.setting_sort_by_popularity)))
         {
             return SortOrder.Popularity;
         }
 
-        if (settingString.equals(context.getResources().getString(R.string.setting_sort_by_rating)))
+        if (settingString.equals(App.getContext().getResources().getString(R.string.setting_sort_by_rating)))
         {
             return SortOrder.Rating;
         }
 
-        if (settingString.equals(context.getResources().getString(R.string.setting_sort_by_favorites)))
+        if (settingString.equals(App.getContext().getResources().getString(R.string.setting_sort_by_favorites)))
         {
             return SortOrder.Favorites;
         }

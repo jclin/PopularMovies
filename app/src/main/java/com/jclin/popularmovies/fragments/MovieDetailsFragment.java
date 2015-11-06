@@ -9,7 +9,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ShareActionProvider;
 import android.text.Html;
 import android.util.Log;
@@ -50,7 +49,7 @@ import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import butterknife.OnItemClick;
 
-public class MovieDetailsActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>
+public class MovieDetailsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>
 {
     private static final String LOG_TAG     = MovieDetailsActivity.class.getName();
     private static final String MOVIE_KEY   = "MOVIE_BUNDLE_KEY";
@@ -74,7 +73,7 @@ public class MovieDetailsActivityFragment extends Fragment implements LoaderMana
     private Movie _movie;
     private TrailerAdapter _trailerAdapter;
 
-    public MovieDetailsActivityFragment()
+    public MovieDetailsFragment()
     {
     }
 
@@ -107,7 +106,7 @@ public class MovieDetailsActivityFragment extends Fragment implements LoaderMana
         _trailersListView = createTrailersListView(inflater, container);
         ButterKnife.bind(this, _trailersListView);
 
-        _movie = getMovieFromArgs(savedInstanceState);
+        _movie = getMovie(savedInstanceState);
 
         _trailerAdapter = new TrailerAdapter(getActivity(), null, 0);
         _trailersListView.setAdapter(_trailerAdapter);
@@ -182,7 +181,7 @@ public class MovieDetailsActivityFragment extends Fragment implements LoaderMana
         }
     }
 
-    private Movie getMovieFromArgs(Bundle savedInstanceState)
+    private Movie getMovie(Bundle savedInstanceState)
     {
         if (savedInstanceState != null)
         {
@@ -211,11 +210,11 @@ public class MovieDetailsActivityFragment extends Fragment implements LoaderMana
         Bundle trailersLoaderArgs = new Bundle();
         trailersLoaderArgs.putLong(TrailersContract.MOVIE_ID_BUNDLE_KEY, movie.getId());
 
-        getActivity().getSupportLoaderManager().initLoader(
-            LoaderIDs.MovieTrailers.id(),
-            trailersLoaderArgs,
-            this
-            );
+        getLoaderManager().initLoader(
+                LoaderIDs.MovieTrailers.id(),
+                trailersLoaderArgs,
+                this
+        );
     }
 
     @NonNull
@@ -287,8 +286,8 @@ public class MovieDetailsActivityFragment extends Fragment implements LoaderMana
             ImageView imageView = (ImageView)_rootLinearLayout.findViewById(R.id.imageView_movie_poster);
 
             int pixelWidth = getActivity()
-                    .getResources()
-                    .getDimensionPixelSize(R.dimen.image_movie_poster_width);
+                .getResources()
+                .getDimensionPixelSize(R.dimen.image_movie_poster_width);
 
             int pixelHeight = ImageSize.pixelHeightFrom(pixelWidth);
 
@@ -300,11 +299,15 @@ public class MovieDetailsActivityFragment extends Fragment implements LoaderMana
             imageView.setLayoutParams(new LinearLayout.LayoutParams(pixelWidth, pixelHeight));
 
             ImageProvider.beginLoadFor(
-                    UriBuilder.buildForImage(_movie.getPosterPath()),
-                    pixelWidth,
-                    pixelHeight,
-                    imageView
-            );
+                UriBuilder.buildForImage(_movie.getPosterPath()),
+                pixelWidth,
+                pixelHeight,
+                imageView
+                );
+
+            _rootLinearLayout
+                .getViewTreeObserver()
+                .removeGlobalOnLayoutListener(this);
         }
     }
 }
