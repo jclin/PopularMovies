@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="MoviesGridViewStyle">
+        <item name="android:choiceMode">singleChoice</item>
+        <item name="android:drawSelectorOnTop">true</item>
+        <item name="android:listSelector">@drawable/movie_item_selector</item>
+    </style>
+
+</resources>

@@ -22,7 +22,7 @@ import com.jclin.popularmovies.loaders.LoaderIDs;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public final class MovieReviewsActivityFragment
+public final class MovieReviewsFragment
     extends Fragment
     implements LoaderManager.LoaderCallbacks<Cursor>
 {
@@ -33,7 +33,7 @@ public final class MovieReviewsActivityFragment
     private long _movieId;
     private CursorAdapter _reviewsAdapter;
 
-    public MovieReviewsActivityFragment()
+    public MovieReviewsFragment()
     {
     }
 

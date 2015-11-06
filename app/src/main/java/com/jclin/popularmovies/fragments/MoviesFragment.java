@@ -31,11 +31,11 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnItemClick;
 
-public class MoviesActivityFragment
+public class MoviesFragment
     extends Fragment
     implements ActionBar.OnNavigationListener, LoaderManager.LoaderCallbacks<Cursor>
 {
-    private final String LOG_TAG = MoviesActivityFragment.class.getName();
+    private final String LOG_TAG = MoviesFragment.class.getName();
 
     private ImageAdapter _imageAdapter;
     private ArrayAdapter<CharSequence> _sortingSpinnerAdapter;
@@ -48,9 +48,11 @@ public class MoviesActivityFragment
     public interface Callbacks
     {
         void onMovieSelected(Movie movie);
+
+        void onSelectionCleared();
     }
 
-    public MoviesActivityFragment()
+    public MoviesFragment()
     {
     }
 
@@ -86,6 +88,8 @@ public class MoviesActivityFragment
         String spinnerString = (String) _sortingSpinnerAdapter.getItem(itemPosition);
         if (updateSortSettingFrom(spinnerString))
         {
+            clearGridViewSelection();
+
             initLoaderBy(Settings.getSortOrder());
 
             return true;
@@ -109,11 +113,7 @@ public class MoviesActivityFragment
             return;
         }
 
-        hideLoadingProgress();
-
-        _imageAdapter.swapCursor(data);
-
-        _gridView.setEmptyView(_noMoviesTextView);
+        updateViewsFrom(data);
     }
 
     @Override
@@ -125,7 +125,17 @@ public class MoviesActivityFragment
     @OnItemClick(R.id.gridView)
     protected void onGridViewItemClick(AdapterView<?> parent, View view, int position, long id)
     {
-        ((Callbacks)getActivity()).onMovieSelected((Movie) view.getTag());
+        notifyActivityOnMovieSelected((Movie) view.getTag());
+    }
+
+    private void notifyActivityOnMovieSelected(Movie movie)
+    {
+        ((Callbacks)getActivity()).onMovieSelected(movie);
+    }
+
+    private void notifyActivityOnSelectionCleared()
+    {
+        ((Callbacks) getActivity()).onSelectionCleared();
     }
 
     private void setupGridViewLayout()
@@ -182,6 +192,12 @@ public class MoviesActivityFragment
 
     private boolean updateSortSettingFrom(String spinnerString)
     {
+        if (spinnerString.equals(Settings.getSortOrder().toString()))
+        {
+            Log.i(LOG_TAG, "spinnerString '" + spinnerString + "' doesn't change the current setting.");
+            return false;
+        }
+
         if (spinnerString.equals(getResources().getString(R.string.spinner_popularity)))
         {
             Settings.setSortOrder(SortOrder.Popularity);
@@ -215,9 +231,11 @@ public class MoviesActivityFragment
     {
         showLoadingProgress();
 
-        getActivity()
-            .getSupportLoaderManager()
-            .initLoader(LoaderIDs.from(sortOrder).id(), null, this);
+        getLoaderManager().initLoader(
+            LoaderIDs.from(sortOrder).id(),
+            null,
+            this
+            );
     }
 
     private void showLoadingProgress()
@@ -231,5 +249,20 @@ public class MoviesActivityFragment
     {
         _moviesLoadingProgressBar.setVisibility(View.GONE);
         _gridView.setVisibility(View.VISIBLE);
+    }
+
+    private void updateViewsFrom(Cursor data)
+    {
+        hideLoadingProgress();
+
+        _imageAdapter.swapCursor(data);
+
+        _gridView.setEmptyView(_noMoviesTextView);
+    }
+
+    private void clearGridViewSelection()
+    {
+        _gridView.clearChoices();
+        notifyActivityOnSelectionCleared();
     }
 }
