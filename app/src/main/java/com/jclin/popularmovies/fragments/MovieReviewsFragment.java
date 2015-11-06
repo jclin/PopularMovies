@@ -102,7 +102,7 @@ public final class MovieReviewsFragment
         Bundle movieIdArgs = new Bundle();
         movieIdArgs.putLong(ReviewsContract.MOVIE_ID_BUNDLE_KEY, movieId);
 
-        getActivity().getSupportLoaderManager().initLoader(
+        getLoaderManager().initLoader(
             LoaderIDs.MovieReviews.id(),
             movieIdArgs,
             this
